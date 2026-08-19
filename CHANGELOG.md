@@ -62,6 +62,9 @@ Presets and history from 1.x are not carried over — there was no on-disk forma
   `latest-recommended` across the whole solution.
 - Numbering keeps its documented behaviour: padding is a *minimum* width, so a run of `01…99`
   continues into `100` rather than switching to `001`.
+- Releases ship as one compressed, self-contained executable per runtime — x64, ARM64 and x86, about
+  68 MB each, with no .NET install required. The publish settings live in the project file, so a
+  local publish and the one CI runs produce the same binary.
 
 ### Fixed
 

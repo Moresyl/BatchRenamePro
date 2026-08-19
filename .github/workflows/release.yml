@@ -53,10 +53,10 @@ jobs:
         run: dotnet test BatchRenamePro.sln -c Release
 
       - name: Publish
+        # Self-contained, single-file and compressed come from the project file.
         run: >
           dotnet publish src/BatchRenamePro.App/BatchRenamePro.App.csproj
-          -c Release -r ${{ matrix.rid }} --self-contained true
-          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+          -c Release -r ${{ matrix.rid }}
           -p:Version=${{ steps.version.outputs.version }}
           -o publish/${{ matrix.rid }}
         env:

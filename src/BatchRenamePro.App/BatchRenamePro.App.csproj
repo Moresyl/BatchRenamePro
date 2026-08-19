@@ -24,6 +24,22 @@
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <!--
+    How a release is shipped, kept here rather than on the command line so a local publish and the
+    one CI runs produce the same file. Naming a runtime is what opts in, so `dotnet build` and
+    `dotnet run` are unaffected.
+
+    Compression roughly halves the download — 155 MB to 68 MB — in exchange for a one-off
+    decompression the first time it runs. WPF cannot be trimmed, so this is the only lever that
+    moves the number, and for something people download once it is the right trade.
+  -->
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != ''">
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\BatchRenamePro.Core\BatchRenamePro.Core.csproj" />
   </ItemGroup>

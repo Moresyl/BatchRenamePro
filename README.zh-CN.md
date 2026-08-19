@@ -102,13 +102,13 @@ dotnet test  BatchRenamePro.sln -c Release
 dotnet run   --project src\BatchRenamePro.App
 ```
 
-生成与发布版一致的自包含单文件：
+生成与发布版一致的自包含单文件——发布参数写在项目文件里，所以只需指定目标运行时：
 
 ```powershell
-dotnet publish src\BatchRenamePro.App\BatchRenamePro.App.csproj `
-  -c Release -r win-x64 --self-contained true `
-  -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+dotnet publish src\BatchRenamePro.App\BatchRenamePro.App.csproj -c Release -r win-x64
 ```
+
+把 `win-x64` 换成 `win-arm64` 或 `win-x86` 即可。产物是一个约 68 MB 的压缩单文件，不依赖任何外部 .NET 运行时。
 
 > 构建把警告当作错误，分析器等级为 `latest-recommended`。这是刻意的：只有这样"构建通过"才是一个有意义的信号。
 > 请修掉它，而不是压制它。

@@ -107,13 +107,15 @@ dotnet test  BatchRenamePro.sln -c Release
 dotnet run   --project src\BatchRenamePro.App
 ```
 
-Producing the same self-contained single file the releases ship:
+Producing the same self-contained single file the releases ship — naming a runtime is all it takes,
+since the project carries the publish settings:
 
 ```powershell
-dotnet publish src\BatchRenamePro.App\BatchRenamePro.App.csproj `
-  -c Release -r win-x64 --self-contained true `
-  -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+dotnet publish src\BatchRenamePro.App\BatchRenamePro.App.csproj -c Release -r win-x64
 ```
+
+Swap `win-x64` for `win-arm64` or `win-x86`. The result is one compressed ~68 MB executable with no
+external dependency on .NET.
 
 > The build treats warnings as errors and runs the .NET analyzers at `latest-recommended`. That is
 > deliberate: a green build is a meaningful signal, so keep it green rather than suppressing it.

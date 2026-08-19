@@ -89,12 +89,19 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ matrix.rid }}-${{ hashFiles('**/Directory.Packages.props', '**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-${{ matrix.rid }}-
+
       - name: Publish
+        # Self-contained, single-file and compressed come from the project file, so naming the
+        # runtime is the whole command and CI cannot drift from what a contributor runs locally.
         run: >
           dotnet publish src/BatchRenamePro.App/BatchRenamePro.App.csproj
-          -c Release -r ${{ matrix.rid }} --self-contained true
-          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
-          -o publish/${{ matrix.rid }}
+          -c Release -r ${{ matrix.rid }} -o publish/${{ matrix.rid }}
 
       - name: Verify the executable was produced
         shell: pwsh
