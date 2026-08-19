@@ -24,6 +24,18 @@ that risk. Every rule you add updates a live preview with the old and new name s
 changed characters highlighted; anything unsafe is blocked *before* the first file moves; and what
 does run is a two-phase transaction that rolls itself back if any step fails.
 
+<!--
+    Screenshots go here, and they are the biggest thing this README is still missing — for a
+    desktop app they do more than any paragraph above. Take three at 1320x860 with the window
+    maximised, save them under docs/images/, and reference them with a <div align="center"> block:
+
+      1. rename.png    the rename page with a few rules stacked and the preview showing diffs
+      2. presets.png   the presets page
+      3. dark.png      the same rename page in the other theme, to show the theming off
+
+    Keep each under about 400 KB — a PNG that size loads instantly on a phone.
+-->
+
 ## Highlights
 
 | | |
