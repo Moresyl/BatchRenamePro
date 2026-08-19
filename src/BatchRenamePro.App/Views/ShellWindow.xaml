@@ -1,0 +1,428 @@
+<Window
+    x:Class="BatchRenamePro.App.Views.ShellWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:loc="clr-namespace:BatchRenamePro.App.Localization"
+    xmlns:services="clr-namespace:BatchRenamePro.App.Services"
+    xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+    xmlns:views="clr-namespace:BatchRenamePro.App.Views"
+    xmlns:vm="clr-namespace:BatchRenamePro.App.ViewModels"
+    Title="{loc:T app.name}"
+    Width="1320"
+    Height="860"
+    MinWidth="1040"
+    MinHeight="620"
+    Background="{DynamicResource Brush.Bg.Base}"
+    FontFamily="{StaticResource Font.Family}"
+    Foreground="{DynamicResource Brush.Text.Primary}"
+    Icon="pack://application:,,,/Assets/app-256.png"
+    TextOptions.TextFormattingMode="Ideal"
+    TextOptions.TextRenderingMode="ClearType"
+    UseLayoutRounding="True"
+    WindowStartupLocation="CenterScreen">
+
+    <!--
+        The window draws its own title bar so that the navigation rail can run the full height of
+        the window and the caption can carry the search-free, toolbar-free look the app is after.
+        GlassFrameThickness is left at zero: the backdrop is applied through DWM in code-behind, and
+        a glass frame on top of it would double up the material.
+    -->
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome
+            CaptionHeight="38"
+            CornerRadius="0"
+            GlassFrameThickness="0"
+            NonClientFrameEdges="None"
+            ResizeBorderThickness="6"
+            UseAeroCaptionButtons="False" />
+    </shell:WindowChrome.WindowChrome>
+
+    <Window.Resources>
+
+        <!-- A rail entry. The label goes away with the rail; the icon never does. -->
+        <DataTemplate x:Key="Nav.Template" DataType="{x:Type vm:NavigationItem}">
+            <StackPanel Orientation="Horizontal">
+                <Path
+                    Width="17"
+                    Height="17"
+                    Data="{Binding IconKey, Converter={StaticResource Resource}}"
+                    Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                    Style="{StaticResource Icon}" />
+                <TextBlock
+                    Margin="13,0,0,0"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource Text.Body}"
+                    Text="{Binding TitleCode, Converter={StaticResource Localize}}"
+                    Visibility="{Binding DataContext.IsNavigationExpanded, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
+            </StackPanel>
+        </DataTemplate>
+
+        <!--
+            The rail entry's own container. Without an explicit name a screen reader falls back to
+            the bound record's ToString(), and once the rail collapses there is no label in the
+            template to fall back to either — so the title is stated here outright, and it stays
+            correct in both rail states and in both languages.
+        -->
+        <Style x:Key="Nav.Entry" BasedOn="{StaticResource Nav.Item}" TargetType="ListBoxItem">
+            <Setter Property="AutomationProperties.Name" Value="{Binding TitleCode, Converter={StaticResource Localize}}" />
+            <Setter Property="ToolTip" Value="{Binding TitleCode, Converter={StaticResource Localize}}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.IsNavigationExpanded, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
+                    <!-- Expanded, the label is right there; a tooltip repeating it is just noise. -->
+                    <Setter Property="ToolTip" Value="{x:Null}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Border x:Name="RootBorder" Background="{DynamicResource Brush.Bg.Base}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- ==== Title bar ================================================================= -->
+
+            <Grid
+                Grid.ColumnSpan="2"
+                Height="38"
+                Background="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel
+                    Margin="14,0,0,0"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <Image
+                        Width="17"
+                        Height="17"
+                        Margin="0,0,9,0"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        Source="pack://application:,,,/Assets/app-256.png" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource Brush.Text.Secondary}"
+                        Style="{StaticResource Text.Caption}"
+                        Text="{loc:T app.name}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <!-- The glyph shows where the click goes, not where it is: dark theme, sun. -->
+                    <Button Command="{Binding ToggleThemeCommand}" ToolTip="{loc:T action.toggleTheme}">
+                        <Button.Style>
+                            <Style BasedOn="{StaticResource Button.Window}" TargetType="Button">
+                                <Setter Property="Tag" Value="{StaticResource Icon.Moon}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDark}" Value="True">
+                                        <Setter Property="Tag" Value="{StaticResource Icon.Sun}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button
+                        Click="OnMinimize"
+                        Style="{StaticResource Button.Window}"
+                        Tag="{StaticResource Icon.Window.Minimize}"
+                        ToolTip="{loc:T window.minimize}" />
+                    <Button
+                        x:Name="MaximizeButton"
+                        Click="OnMaximizeRestore"
+                        Style="{StaticResource Button.Window}"
+                        Tag="{StaticResource Icon.Window.Maximize}"
+                        ToolTip="{loc:T window.maximize}" />
+                    <Button
+                        Click="OnClose"
+                        Style="{StaticResource Button.Window.Close}"
+                        Tag="{StaticResource Icon.Window.Close}"
+                        ToolTip="{loc:T window.close}" />
+                </StackPanel>
+            </Grid>
+
+            <!-- ==== Navigation rail =========================================================== -->
+
+            <Grid Grid.Row="1" Margin="10,4,6,16">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Width" Value="56" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsNavigationExpanded}" Value="True">
+                                <Setter Property="Width" Value="206" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Button
+                    Margin="4,0,0,8"
+                    HorizontalAlignment="Left"
+                    Command="{Binding ToggleNavigationCommand}"
+                    Style="{StaticResource Button.Icon}"
+                    Tag="{StaticResource Icon.Menu}"
+                    ToolTip="{loc:T nav.toggle}" />
+
+                <ListBox
+                    Grid.Row="1"
+                    ItemContainerStyle="{StaticResource Nav.Entry}"
+                    ItemTemplate="{StaticResource Nav.Template}"
+                    ItemsSource="{x:Static vm:ShellViewModel.PrimaryNavigation}"
+                    SelectedValue="{Binding Page}"
+                    SelectedValuePath="Page" />
+
+                <ListBox
+                    Grid.Row="2"
+                    ItemContainerStyle="{StaticResource Nav.Entry}"
+                    ItemTemplate="{StaticResource Nav.Template}"
+                    ItemsSource="{x:Static vm:ShellViewModel.SecondaryNavigation}"
+                    SelectedValue="{Binding Page}"
+                    SelectedValuePath="Page" />
+            </Grid>
+
+            <!-- ==== Pages ==================================================================== -->
+
+            <!--
+                Every page stays alive and merely hides, which is what keeps a half-built rule
+                pipeline, a scroll position and an expanded card intact across a trip to Settings.
+                The pages are cheap; rebuilding the user's train of thought is not.
+            -->
+            <Grid Grid.Row="1" Grid.Column="1">
+                <views:RenamePage
+                    DataContext="{Binding Rename}"
+                    Visibility="{Binding DataContext.Page, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource EqualsToVisibility}, ConverterParameter=Rename}" />
+                <views:PresetsPage
+                    DataContext="{Binding Rename}"
+                    Visibility="{Binding DataContext.Page, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource EqualsToVisibility}, ConverterParameter=Presets}" />
+                <views:HistoryPage
+                    DataContext="{Binding History}"
+                    Visibility="{Binding DataContext.Page, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource EqualsToVisibility}, ConverterParameter=History}" />
+                <views:SettingsPage
+                    DataContext="{Binding Settings}"
+                    Visibility="{Binding DataContext.Page, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource EqualsToVisibility}, ConverterParameter=Settings}" />
+                <views:AboutPage
+                    DataContext="{Binding About}"
+                    Visibility="{Binding DataContext.Page, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource EqualsToVisibility}, ConverterParameter=About}" />
+            </Grid>
+
+            <!-- ==== Toasts =================================================================== -->
+
+            <ItemsControl
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="0,0,32,32"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                ItemsSource="{Binding Notifications.Items}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type services:Notification}">
+                        <Border
+                            MinWidth="300"
+                            MaxWidth="420"
+                            Margin="0,8,0,0"
+                            Padding="14,12"
+                            Background="{DynamicResource Brush.Bg.Flyout}"
+                            BorderBrush="{DynamicResource Brush.Stroke.Default}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource Radius.Large}"
+                            Effect="{DynamicResource Effect.Shadow.Flyout}">
+                            <Border.RenderTransform>
+                                <TranslateTransform x:Name="Slide" X="24" />
+                            </Border.RenderTransform>
+                            <Border.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="Opacity"
+                                                From="0"
+                                                To="1"
+                                                Duration="0:0:0.22" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="Slide"
+                                                Storyboard.TargetProperty="X"
+                                                To="0"
+                                                Duration="0:0:0.28">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Border.Triggers>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Path
+                                    x:Name="Glyph"
+                                    Width="17"
+                                    Height="17"
+                                    Margin="0,1,12,0"
+                                    VerticalAlignment="Top"
+                                    Data="{StaticResource Icon.Info}"
+                                    Fill="{DynamicResource Brush.Info}"
+                                    Style="{StaticResource Icon}" />
+
+                                <TextBlock
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource Text.Body}"
+                                    Text="{Binding Message}"
+                                    TextWrapping="Wrap" />
+
+                                <Button
+                                    Grid.Column="2"
+                                    Margin="10,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding InvokeCommand}"
+                                    Content="{Binding ActionLabel}"
+                                    Style="{StaticResource Button.Link}"
+                                    Visibility="{Binding HasAction, Converter={StaticResource BoolToVisibility}}" />
+
+                                <Button
+                                    Grid.Column="3"
+                                    Margin="6,0,0,0"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding DismissCommand}"
+                                    Style="{StaticResource Button.Icon.Small}"
+                                    Tag="{StaticResource Icon.Window.Close}" />
+                            </Grid>
+                        </Border>
+
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Kind}" Value="{x:Static services:NotificationKind.Success}">
+                                <Setter TargetName="Glyph" Property="Data" Value="{StaticResource Icon.Success}" />
+                                <Setter TargetName="Glyph" Property="Fill" Value="{DynamicResource Brush.Success}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Kind}" Value="{x:Static services:NotificationKind.Warning}">
+                                <Setter TargetName="Glyph" Property="Data" Value="{StaticResource Icon.Warning}" />
+                                <Setter TargetName="Glyph" Property="Fill" Value="{DynamicResource Brush.Warning}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Kind}" Value="{x:Static services:NotificationKind.Error}">
+                                <Setter TargetName="Glyph" Property="Data" Value="{StaticResource Icon.Error}" />
+                                <Setter TargetName="Glyph" Property="Fill" Value="{DynamicResource Brush.Danger}" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- ==== Modal dialog ============================================================== -->
+
+            <Grid
+                Grid.RowSpan="2"
+                Grid.ColumnSpan="2"
+                Background="{DynamicResource Brush.Bg.Scrim}"
+                Visibility="{Binding Dialogs.Current, Converter={StaticResource NullToVisibility}}">
+                <ContentControl
+                    Width="440"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Content="{Binding Dialogs.Current}"
+                    Focusable="False">
+                    <ContentControl.ContentTemplate>
+                        <DataTemplate DataType="{x:Type services:DialogRequest}">
+                            <Border
+                                Padding="24,22"
+                                Background="{DynamicResource Brush.Bg.Flyout}"
+                                BorderBrush="{DynamicResource Brush.Stroke.Default}"
+                                BorderThickness="1"
+                                CornerRadius="{StaticResource Radius.XLarge}"
+                                Effect="{DynamicResource Effect.Shadow.Flyout}">
+                                <StackPanel>
+                                    <StackPanel Margin="0,0,0,12" Orientation="Horizontal">
+                                        <Path
+                                            x:Name="Glyph"
+                                            Width="20"
+                                            Height="20"
+                                            Margin="0,0,12,0"
+                                            VerticalAlignment="Center"
+                                            Data="{StaticResource Icon.Question}"
+                                            Fill="{DynamicResource Brush.Accent.Default}"
+                                            Style="{StaticResource Icon}" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource Text.Subtitle}"
+                                            Text="{Binding Title}" />
+                                    </StackPanel>
+
+                                    <TextBlock
+                                        Style="{StaticResource Text.Secondary}"
+                                        Text="{Binding Message}"
+                                        TextWrapping="Wrap" />
+
+                                    <TextBox
+                                        x:Name="Input"
+                                        Margin="0,14,0,0"
+                                        Text="{Binding Input, UpdateSourceTrigger=PropertyChanged}"
+                                        Visibility="{Binding IsInput, Converter={StaticResource BoolToVisibility}}" />
+
+                                    <StackPanel
+                                        Margin="0,22,0,0"
+                                        HorizontalAlignment="Right"
+                                        Orientation="Horizontal">
+                                        <Button
+                                            MinWidth="92"
+                                            Margin="0,0,8,0"
+                                            HorizontalContentAlignment="Center"
+                                            Command="{Binding CancelCommand}"
+                                            Content="{Binding CancelLabel}"
+                                            IsCancel="True"
+                                            Visibility="{Binding CanCancel, Converter={StaticResource BoolToVisibility}}" />
+                                        <Button
+                                            x:Name="Confirm"
+                                            MinWidth="92"
+                                            HorizontalContentAlignment="Center"
+                                            Command="{Binding ConfirmCommand}"
+                                            Content="{Binding ConfirmLabel}"
+                                            IsDefault="True"
+                                            Style="{StaticResource Button.Accent}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Kind}" Value="{x:Static services:DialogKind.Success}">
+                                    <Setter TargetName="Glyph" Property="Data" Value="{StaticResource Icon.Success}" />
+                                    <Setter TargetName="Glyph" Property="Fill" Value="{DynamicResource Brush.Success}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Kind}" Value="{x:Static services:DialogKind.Warning}">
+                                    <Setter TargetName="Glyph" Property="Data" Value="{StaticResource Icon.Warning}" />
+                                    <Setter TargetName="Glyph" Property="Fill" Value="{DynamicResource Brush.Warning}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Kind}" Value="{x:Static services:DialogKind.Error}">
+                                    <Setter TargetName="Glyph" Property="Data" Value="{StaticResource Icon.Error}" />
+                                    <Setter TargetName="Glyph" Property="Fill" Value="{DynamicResource Brush.Danger}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsDestructive}" Value="True">
+                                    <Setter TargetName="Confirm" Property="Style" Value="{StaticResource Button.Danger}" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ContentControl.ContentTemplate>
+                </ContentControl>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

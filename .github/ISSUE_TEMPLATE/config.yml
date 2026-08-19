@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or idea
+    url: https://github.com/batchrenamepro/batchrenamepro/discussions
+    about: Not sure whether it is a bug? Ask here first — English or 中文.
+  - name: Security vulnerability
+    url: https://github.com/batchrenamepro/batchrenamepro/security/advisories/new
+    about: Report privately, never in a public issue.

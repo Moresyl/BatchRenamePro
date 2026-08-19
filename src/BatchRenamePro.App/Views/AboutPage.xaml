@@ -1,0 +1,199 @@
+<UserControl
+    x:Class="BatchRenamePro.App.Views.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:loc="clr-namespace:BatchRenamePro.App.Localization"
+    xmlns:vm="clr-namespace:BatchRenamePro.App.ViewModels">
+
+    <Border Margin="0,0,16,16" Style="{StaticResource Panel}">
+        <ScrollViewer Padding="20,20,14,20" VerticalScrollBarVisibility="Auto">
+            <StackPanel MaxWidth="760" HorizontalAlignment="Left">
+
+                <!-- ==== Identity ==== -->
+
+                <Grid Margin="0,0,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Image
+                        Width="72"
+                        Height="72"
+                        Margin="0,0,20,0"
+                        VerticalAlignment="Top"
+                        RenderOptions.BitmapScalingMode="HighQuality"
+                        Source="pack://application:,,,/Assets/app-256.png" />
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource Text.Title}" Text="{loc:T app.name}" />
+                        <TextBlock
+                            Margin="0,6,0,0"
+                            Style="{StaticResource Text.Secondary}"
+                            Text="{loc:T app.tagline}"
+                            TextWrapping="Wrap" />
+                        <StackPanel Margin="0,12,0,0" Orientation="Horizontal">
+                            <Border Style="{StaticResource Chip.Info}">
+                                <TextBlock Style="{StaticResource Text.Caption}" Text="{x:Static vm:AboutViewModel.Version}" />
+                            </Border>
+                            <Border Margin="6,0,0,0" Style="{StaticResource Chip.Success}">
+                                <TextBlock Style="{StaticResource Text.Caption}" Text="{loc:T about.license.mit}" />
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ==== Links ==== -->
+
+                <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+                    <Button
+                        Command="{Binding OpenLinkCommand}"
+                        CommandParameter="{x:Static vm:AboutViewModel.Repository}"
+                        Content="{loc:T about.repository}"
+                        Style="{StaticResource Button.Accent}"
+                        Tag="{StaticResource Icon.Link}" />
+                    <Button
+                        Margin="8,0,0,0"
+                        Command="{Binding OpenLinkCommand}"
+                        CommandParameter="{x:Static vm:AboutViewModel.Issues}"
+                        Content="{loc:T about.issues}"
+                        Tag="{StaticResource Icon.Question}" />
+                    <Button
+                        Margin="8,0,0,0"
+                        Command="{Binding OpenLinkCommand}"
+                        CommandParameter="{x:Static vm:AboutViewModel.License}"
+                        Content="{loc:T about.license}"
+                        Tag="{StaticResource Icon.File}" />
+                </StackPanel>
+
+                <!-- ==== Environment ==== -->
+
+                <TextBlock
+                    Margin="0,26,0,8"
+                    Style="{StaticResource Text.Section}"
+                    Text="{loc:T about.environment}" />
+                <Border Padding="18,14" Style="{StaticResource Card}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock
+                            Margin="0,0,24,7"
+                            Style="{StaticResource Text.Secondary}"
+                            Text="{loc:T about.version}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="0,0,0,7"
+                            Style="{StaticResource Text.Mono}"
+                            Text="{x:Static vm:AboutViewModel.Version}" />
+
+                        <TextBlock
+                            Grid.Row="1"
+                            Margin="0,0,24,7"
+                            Style="{StaticResource Text.Secondary}"
+                            Text="{loc:T about.runtime}" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="0,0,0,7"
+                            Style="{StaticResource Text.Mono}"
+                            Text="{x:Static vm:AboutViewModel.Runtime}" />
+
+                        <TextBlock
+                            Grid.Row="2"
+                            Margin="0,0,24,0"
+                            Style="{StaticResource Text.Secondary}"
+                            Text="{loc:T about.os}" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Style="{StaticResource Text.Mono}"
+                            Text="{x:Static vm:AboutViewModel.OperatingSystem}"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                </Border>
+
+                <!-- ==== Token reference ==== -->
+
+                <TextBlock
+                    Margin="0,26,0,8"
+                    Style="{StaticResource Text.Section}"
+                    Text="{loc:T about.tokens}" />
+                <TextBlock
+                    Margin="0,0,0,10"
+                    Style="{StaticResource Text.Secondary}"
+                    Text="{loc:T about.tokens.hint}"
+                    TextWrapping="Wrap" />
+
+                <ItemsControl ItemsSource="{Binding Tokens.Groups}">
+                    <!-- Otherwise each card is announced as "BatchRenamePro.App.ViewModels.TokenGroup". -->
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:TokenGroup}">
+                            <Border
+                                Margin="0,0,0,10"
+                                Padding="18,14"
+                                Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock
+                                        Margin="0,0,0,10"
+                                        Style="{StaticResource Text.BodyStrong}"
+                                        Text="{Binding Title}" />
+                                    <ItemsControl ItemsSource="{Binding Tokens}">
+                                        <ItemsControl.ItemContainerStyle>
+                                            <Style TargetType="ContentPresenter">
+                                                <Setter Property="AutomationProperties.Name">
+                                                    <Setter.Value>
+                                                        <MultiBinding StringFormat="{}{0} &#x2014; {1}">
+                                                            <Binding Path="Token" />
+                                                            <Binding Path="Description" />
+                                                        </MultiBinding>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </ItemsControl.ItemContainerStyle>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type vm:TokenItem}">
+                                                <Grid Margin="0,0,0,6">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="180" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock
+                                                        Foreground="{DynamicResource Brush.Text.Accent}"
+                                                        Style="{StaticResource Text.Mono}"
+                                                        Text="{Binding Token}" />
+                                                    <TextBlock
+                                                        Grid.Column="1"
+                                                        Style="{StaticResource Text.Secondary}"
+                                                        Text="{Binding Description}"
+                                                        TextWrapping="Wrap" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock
+                    Margin="0,10,0,0"
+                    Style="{StaticResource Text.Caption}"
+                    Text="{loc:T about.copyright}" />
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</UserControl>

@@ -1,0 +1,478 @@
+<!--
+    The body of a rule card: one DataTemplate per rule type, keyed by the type itself, so the card
+    only has to say `<ContentControl Content="{Binding Rule}"/>` and the right editor appears.
+
+    Everything here is referenced with DynamicResource rather than StaticResource. This dictionary is
+    a sibling of Controls.xaml in Application.Resources, and a StaticResource inside a merged
+    dictionary cannot see a sibling — DynamicResource resolves through the element tree at runtime,
+    where the styles are visible. Merging Controls.xaml in here instead would work but would register
+    the entire control library a second time.
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:abs="clr-namespace:BatchRenamePro.Core.Abstractions;assembly=BatchRenamePro.Core"
+    xmlns:controls="clr-namespace:BatchRenamePro.App.Controls"
+    xmlns:convert="clr-namespace:BatchRenamePro.App.Converters"
+    xmlns:loc="clr-namespace:BatchRenamePro.App.Localization"
+    xmlns:rules="clr-namespace:BatchRenamePro.Core.Rules;assembly=BatchRenamePro.Core"
+    xmlns:tokens="clr-namespace:BatchRenamePro.Core.Tokens;assembly=BatchRenamePro.Core">
+
+    <!-- Declared here rather than shared, for the same sibling-dictionary reason as above: a
+         Converter cannot be a DynamicResource, so this dictionary needs its own instance. -->
+    <convert:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+
+    <!-- ==== Field scaffolding =============================================================== -->
+
+    <Style x:Key="Field" TargetType="StackPanel">
+        <Setter Property="Margin" Value="0,0,0,12" />
+    </Style>
+
+    <Style x:Key="Field.Label" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{DynamicResource Font.Family}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+        <Setter Property="Margin" Value="2,0,0,5" />
+    </Style>
+
+    <Style x:Key="Field.Check" TargetType="CheckBox">
+        <Setter Property="Margin" Value="0,0,0,10" />
+    </Style>
+
+    <Style x:Key="Field.Number" TargetType="TextBox">
+        <Setter Property="Width" Value="76" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+
+    <!-- Every enum picker in this file: value in, localized label out. -->
+    <Style x:Key="Field.Enum" TargetType="ComboBox">
+        <Setter Property="DisplayMemberPath" Value="Text" />
+        <Setter Property="SelectedValuePath" Value="Value" />
+    </Style>
+
+    <!-- ==== Shared blocks =================================================================== -->
+
+    <!--
+        Which part of the name a rule touches. Present on nearly every rule, because "uppercase" and
+        "uppercase the extension too" are different enough to be worth one control rather than two
+        rule types.
+    -->
+    <DataTemplate x:Key="Editor.Scope">
+        <StackPanel Style="{DynamicResource Field}">
+            <TextBlock
+                x:Name="LabelScope"
+                Style="{DynamicResource Field.Label}"
+                Text="{loc:T rules.scope}" />
+            <ComboBox
+                AutomationProperties.LabeledBy="{Binding ElementName=LabelScope}"
+                ItemsSource="{loc:EnumSource {x:Type abs:RenameScope}}"
+                SelectedValue="{Binding Scope}"
+                Style="{DynamicResource Field.Enum}" />
+        </StackPanel>
+    </DataTemplate>
+
+    <!-- The numbering block, shared by the pattern, insert and number rules. -->
+    <DataTemplate x:Key="Editor.Sequence" DataType="{x:Type tokens:SequenceSettings}">
+        <StackPanel>
+            <TextBlock Style="{DynamicResource Text.Section}" Text="{loc:T rule.sequence.title}" />
+
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelNumberStyle"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.number.style}" />
+                <ComboBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelNumberStyle}"
+                    ItemsSource="{loc:EnumSource {x:Type tokens:SequenceStyle}}"
+                    SelectedValue="{Binding Style}"
+                    Style="{DynamicResource Field.Enum}" />
+            </StackPanel>
+
+            <WrapPanel>
+                <StackPanel Margin="0,0,12,12">
+                    <TextBlock
+                        x:Name="LabelNumberStart"
+                        Style="{DynamicResource Field.Label}"
+                        Text="{loc:T rule.number.start}" />
+                    <TextBox
+                        AutomationProperties.LabeledBy="{Binding ElementName=LabelNumberStart}"
+                        Style="{DynamicResource Field.Number}"
+                        Text="{Binding Start}" />
+                </StackPanel>
+                <StackPanel Margin="0,0,12,12">
+                    <TextBlock
+                        x:Name="LabelNumberStep"
+                        Style="{DynamicResource Field.Label}"
+                        Text="{loc:T rule.number.step}" />
+                    <TextBox
+                        AutomationProperties.LabeledBy="{Binding ElementName=LabelNumberStep}"
+                        Style="{DynamicResource Field.Number}"
+                        Text="{Binding Step}" />
+                </StackPanel>
+                <StackPanel Margin="0,0,12,12">
+                    <TextBlock
+                        x:Name="LabelNumberPadding"
+                        Style="{DynamicResource Field.Label}"
+                        Text="{loc:T rule.number.padding}" />
+                    <TextBox
+                        AutomationProperties.LabeledBy="{Binding ElementName=LabelNumberPadding}"
+                        Style="{DynamicResource Field.Number}"
+                        Text="{Binding Padding}" />
+                </StackPanel>
+                <StackPanel Margin="0,0,0,12">
+                    <TextBlock
+                        x:Name="LabelNumberGroupSize"
+                        Style="{DynamicResource Field.Label}"
+                        Text="{loc:T rule.number.groupSize}" />
+                    <TextBox
+                        AutomationProperties.LabeledBy="{Binding ElementName=LabelNumberGroupSize}"
+                        Style="{DynamicResource Field.Number}"
+                        Text="{Binding GroupSize}" />
+                </StackPanel>
+            </WrapPanel>
+        </StackPanel>
+    </DataTemplate>
+
+    <!-- ==== Pattern ========================================================================= -->
+
+    <DataTemplate DataType="{x:Type rules:PatternRule}">
+        <StackPanel>
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelPattern"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.pattern.label}" />
+                <controls:PatternEditor
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelPattern}"
+                    Hint="{loc:T rule.pattern.hint}"
+                    Pattern="{Binding Pattern}" />
+            </StackPanel>
+
+            <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource Editor.Scope}" />
+            <ContentControl Content="{Binding Sequence}" ContentTemplate="{DynamicResource Editor.Sequence}" />
+        </StackPanel>
+    </DataTemplate>
+
+    <!-- ==== Replace ========================================================================= -->
+
+    <DataTemplate DataType="{x:Type rules:ReplaceRule}">
+        <StackPanel>
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelReplaceFind"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.replace.find}" />
+                <TextBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelReplaceFind}"
+                    Style="{DynamicResource TextBox.Mono}"
+                    Text="{Binding Find, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelReplaceReplaceWith"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.replace.replaceWith}" />
+                <TextBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelReplaceReplaceWith}"
+                    Style="{DynamicResource TextBox.Mono}"
+                    Text="{Binding ReplaceWith, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <CheckBox
+                Content="{loc:T rule.replace.useRegex}"
+                IsChecked="{Binding UseRegex}"
+                Style="{DynamicResource Field.Check}" />
+            <CheckBox
+                Content="{loc:T rule.replace.ignoreCase}"
+                IsChecked="{Binding IgnoreCase}"
+                Style="{DynamicResource Field.Check}" />
+            <CheckBox
+                Content="{loc:T rule.replace.firstOnly}"
+                IsChecked="{Binding FirstOccurrenceOnly}"
+                Style="{DynamicResource Field.Check}" />
+
+            <TextBlock
+                Margin="0,0,0,12"
+                Style="{DynamicResource Text.Caption}"
+                Text="{loc:T rule.replace.regexHint}"
+                TextWrapping="Wrap"
+                Visibility="{Binding UseRegex, Converter={StaticResource BoolToVisibility}}" />
+
+            <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource Editor.Scope}" />
+        </StackPanel>
+    </DataTemplate>
+
+    <!-- ==== Number ========================================================================== -->
+
+    <DataTemplate DataType="{x:Type rules:NumberRule}">
+        <StackPanel>
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelNumberPosition"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.number.position}" />
+                <ComboBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelNumberPosition}"
+                    ItemsSource="{loc:EnumSource {x:Type rules:InsertPosition}}"
+                    SelectedValue="{Binding Position}"
+                    Style="{DynamicResource Field.Enum}" />
+            </StackPanel>
+
+            <WrapPanel>
+                <StackPanel Margin="0,0,12,12">
+                    <TextBlock
+                        x:Name="LabelInsertIndex"
+                        Style="{DynamicResource Field.Label}"
+                        Text="{loc:T rule.insert.index}" />
+                    <TextBox
+                        AutomationProperties.LabeledBy="{Binding ElementName=LabelInsertIndex}"
+                        Style="{DynamicResource Field.Number}"
+                        Text="{Binding Index}" />
+                </StackPanel>
+                <StackPanel Margin="0,0,0,12">
+                    <TextBlock
+                        x:Name="LabelNumberSeparator"
+                        Style="{DynamicResource Field.Label}"
+                        Text="{loc:T rule.number.separator}" />
+                    <TextBox
+                        AutomationProperties.LabeledBy="{Binding ElementName=LabelNumberSeparator}"
+                        Width="100"
+                        HorizontalContentAlignment="Center"
+                        Style="{DynamicResource TextBox.Mono}"
+                        Text="{Binding Separator, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+            </WrapPanel>
+
+            <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource Editor.Scope}" />
+            <ContentControl Content="{Binding Sequence}" ContentTemplate="{DynamicResource Editor.Sequence}" />
+        </StackPanel>
+    </DataTemplate>
+
+    <!-- ==== Insert ========================================================================== -->
+
+    <DataTemplate DataType="{x:Type rules:InsertRule}">
+        <StackPanel>
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelInsertText"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.insert.text}" />
+                <controls:PatternEditor
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelInsertText}"
+                    Hint="{loc:T rule.pattern.hint}"
+                    Pattern="{Binding Text}" />
+            </StackPanel>
+
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelInsertPosition"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.insert.position}" />
+                <ComboBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelInsertPosition}"
+                    ItemsSource="{loc:EnumSource {x:Type rules:InsertPosition}}"
+                    SelectedValue="{Binding Position}"
+                    Style="{DynamicResource Field.Enum}" />
+            </StackPanel>
+
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelInsertIndex"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.insert.index}" />
+                <TextBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelInsertIndex}"
+                    Style="{DynamicResource Field.Number}"
+                    Text="{Binding Index}" />
+            </StackPanel>
+
+            <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource Editor.Scope}" />
+            <ContentControl Content="{Binding Sequence}" ContentTemplate="{DynamicResource Editor.Sequence}" />
+        </StackPanel>
+    </DataTemplate>
+
+    <!-- ==== Remove ========================================================================== -->
+
+    <DataTemplate DataType="{x:Type rules:RemoveRule}">
+        <StackPanel>
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelRemoveMode"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.remove.mode}" />
+                <ComboBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelRemoveMode}"
+                    ItemsSource="{loc:EnumSource {x:Type rules:RemoveMode}}"
+                    SelectedValue="{Binding Mode}"
+                    Style="{DynamicResource Field.Enum}" />
+            </StackPanel>
+
+            <WrapPanel>
+                <StackPanel Margin="0,0,12,12">
+                    <TextBlock
+                        x:Name="LabelRemoveCount"
+                        Style="{DynamicResource Field.Label}"
+                        Text="{loc:T rule.remove.count}" />
+                    <TextBox
+                        AutomationProperties.LabeledBy="{Binding ElementName=LabelRemoveCount}"
+                        Style="{DynamicResource Field.Number}"
+                        Text="{Binding Count}" />
+                </StackPanel>
+                <StackPanel Margin="0,0,0,12">
+                    <TextBlock
+                        x:Name="LabelRemovePosition"
+                        Style="{DynamicResource Field.Label}"
+                        Text="{loc:T rule.remove.position}" />
+                    <TextBox
+                        AutomationProperties.LabeledBy="{Binding ElementName=LabelRemovePosition}"
+                        Style="{DynamicResource Field.Number}"
+                        Text="{Binding Position}" />
+                </StackPanel>
+            </WrapPanel>
+
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelRemoveText"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.remove.text}" />
+                <TextBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelRemoveText}"
+                    Style="{DynamicResource TextBox.Mono}"
+                    Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelRemoveKeep"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.remove.keep}" />
+                <TextBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelRemoveKeep}"
+                    Style="{DynamicResource TextBox.Mono}"
+                    Text="{Binding KeepCharacters, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <CheckBox
+                Content="{loc:T rule.replace.ignoreCase}"
+                IsChecked="{Binding IgnoreCase}"
+                Style="{DynamicResource Field.Check}" />
+
+            <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource Editor.Scope}" />
+        </StackPanel>
+    </DataTemplate>
+
+    <!-- ==== Case ============================================================================ -->
+
+    <DataTemplate DataType="{x:Type rules:CaseRule}">
+        <StackPanel>
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelCaseMode"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.case.mode}" />
+                <ComboBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelCaseMode}"
+                    ItemsSource="{loc:EnumSource {x:Type rules:CaseMode}}"
+                    SelectedValue="{Binding Mode}"
+                    Style="{DynamicResource Field.Enum}" />
+            </StackPanel>
+
+            <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource Editor.Scope}" />
+        </StackPanel>
+    </DataTemplate>
+
+    <!-- ==== Extension ======================================================================= -->
+
+    <DataTemplate DataType="{x:Type rules:ExtensionRule}">
+        <StackPanel>
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelExtensionMode"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.extension.mode}" />
+                <ComboBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelExtensionMode}"
+                    ItemsSource="{loc:EnumSource {x:Type rules:ExtensionMode}}"
+                    SelectedValue="{Binding Mode}"
+                    Style="{DynamicResource Field.Enum}" />
+            </StackPanel>
+
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelExtensionNewExtension"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.extension.newExtension}" />
+                <TextBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelExtensionNewExtension}"
+                    Style="{DynamicResource TextBox.Mono}"
+                    Text="{Binding NewExtension, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+        </StackPanel>
+    </DataTemplate>
+
+    <!-- ==== Cleanup ========================================================================= -->
+
+    <DataTemplate DataType="{x:Type rules:CleanupRule}">
+        <StackPanel>
+            <CheckBox
+                Content="{loc:T rule.cleanup.trimEnds}"
+                IsChecked="{Binding TrimEnds}"
+                Style="{DynamicResource Field.Check}" />
+            <CheckBox
+                Content="{loc:T rule.cleanup.collapseWhitespace}"
+                IsChecked="{Binding CollapseWhitespace}"
+                Style="{DynamicResource Field.Check}" />
+            <CheckBox
+                Content="{loc:T rule.cleanup.removeDiacritics}"
+                IsChecked="{Binding RemoveDiacritics}"
+                Style="{DynamicResource Field.Check}" />
+
+            <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                <CheckBox
+                    x:Name="CheckReplaceSpaces"
+                    MinWidth="150"
+                    Content="{loc:T rule.cleanup.replaceSpaces}"
+                    IsChecked="{Binding ReplaceSpaces}" />
+                <TextBox
+                    Width="76"
+                    Margin="10,0,0,0"
+                    HorizontalContentAlignment="Center"
+                    AutomationProperties.LabeledBy="{Binding ElementName=CheckReplaceSpaces}"
+                    IsEnabled="{Binding ReplaceSpaces}"
+                    Style="{DynamicResource TextBox.Mono}"
+                    Text="{Binding SpaceReplacement, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                <CheckBox
+                    x:Name="CheckStripInvalid"
+                    MinWidth="150"
+                    Content="{loc:T rule.cleanup.stripInvalid}"
+                    IsChecked="{Binding StripInvalidCharacters}" />
+                <TextBox
+                    Width="76"
+                    Margin="10,0,0,0"
+                    HorizontalContentAlignment="Center"
+                    AutomationProperties.LabeledBy="{Binding ElementName=CheckStripInvalid}"
+                    IsEnabled="{Binding StripInvalidCharacters}"
+                    Style="{DynamicResource TextBox.Mono}"
+                    Text="{Binding InvalidReplacement, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <StackPanel Style="{DynamicResource Field}">
+                <TextBlock
+                    x:Name="LabelCleanupMaxLength"
+                    Style="{DynamicResource Field.Label}"
+                    Text="{loc:T rule.cleanup.maxLength.label}" />
+                <TextBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelCleanupMaxLength}"
+                    Style="{DynamicResource Field.Number}"
+                    Text="{Binding MaxLength}" />
+            </StackPanel>
+
+            <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource Editor.Scope}" />
+        </StackPanel>
+    </DataTemplate>
+
+</ResourceDictionary>

@@ -1,0 +1,37 @@
+# Normalise line endings in the repository, so a clone on any platform produces the same diff.
+* text=auto
+
+# Source and project files: LF in the repository, native on checkout.
+*.cs        text diff=csharp
+*.csproj    text
+*.sln       text eol=crlf
+*.props     text
+*.targets   text
+*.xaml      text
+*.json      text
+*.md        text
+*.yml       text
+*.yaml      text
+*.editorconfig text
+
+# Windows-only scripts must keep CRLF or they can fail to run.
+*.ps1       text eol=crlf
+*.cmd       text eol=crlf
+*.bat       text eol=crlf
+
+# Shell scripts must keep LF, including on Windows checkouts.
+*.sh        text eol=lf
+
+# Binary: never touch these.
+*.png       binary
+*.ico       binary
+*.jpg       binary
+*.gif       binary
+*.dll       binary
+*.exe       binary
+*.pdb       binary
+*.zip       binary
+*.snk       binary
+
+# Keep generated and vendored content out of language statistics and collapsed in diffs.
+*.xaml      linguist-detectable=true

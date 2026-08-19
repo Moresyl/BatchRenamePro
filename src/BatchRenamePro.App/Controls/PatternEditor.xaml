@@ -1,0 +1,142 @@
+<UserControl
+    x:Class="BatchRenamePro.App.Controls.PatternEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:BatchRenamePro.App.Controls"
+    xmlns:loc="clr-namespace:BatchRenamePro.App.Localization"
+    xmlns:vm="clr-namespace:BatchRenamePro.App.ViewModels"
+    x:Name="Root">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <!--
+            The control a screen reader lands on is this box, not the user control around it, so
+            whatever label the host attached is forwarded inward rather than left on the wrapper.
+        -->
+        <TextBox
+            x:Name="Input"
+            controls:Hint.Text="{Binding Hint, ElementName=Root}"
+            AcceptsReturn="False"
+            AutomationProperties.LabeledBy="{Binding Path=(AutomationProperties.LabeledBy), ElementName=Root}"
+            Style="{StaticResource TextBox.Mono}"
+            Text="{Binding Pattern, ElementName=Root, UpdateSourceTrigger=PropertyChanged}" />
+
+        <ToggleButton
+            x:Name="PickerToggle"
+            Grid.Column="1"
+            Width="34"
+            Height="34"
+            Margin="6,0,0,0"
+            Cursor="Hand"
+            ToolTip="{loc:T rule.pattern.insertToken}">
+            <ToggleButton.Template>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border
+                        x:Name="Chrome"
+                        Background="{DynamicResource Brush.Bg.Control}"
+                        BorderBrush="{DynamicResource Brush.Stroke.Default}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource Radius.Medium}">
+                        <Path
+                            Data="{StaticResource Icon.Pattern}"
+                            Fill="{DynamicResource Brush.Text.Secondary}"
+                            Style="{StaticResource Icon}"
+                            HorizontalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Brush.Bg.ControlHover}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{DynamicResource Brush.Accent.Default}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </ToggleButton.Template>
+        </ToggleButton>
+
+        <Popup
+            AllowsTransparency="True"
+            HorizontalOffset="-8"
+            IsOpen="{Binding IsChecked, ElementName=PickerToggle, Mode=TwoWay}"
+            Placement="Bottom"
+            PlacementTarget="{Binding ElementName=PickerToggle}"
+            StaysOpen="False"
+            VerticalOffset="4">
+            <Border
+                Width="360"
+                MaxHeight="420"
+                Margin="10"
+                Padding="4,10"
+                Background="{DynamicResource Brush.Bg.Flyout}"
+                BorderBrush="{DynamicResource Brush.Stroke.Default}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource Radius.Large}"
+                Effect="{DynamicResource Effect.Shadow.Flyout}">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="14,0,14,10">
+                        <TextBlock Style="{StaticResource Text.Subtitle}" Text="{loc:T tokens.title}" />
+                        <TextBlock
+                            Margin="0,3,0,0"
+                            Style="{StaticResource Text.Caption}"
+                            Text="{loc:T tokens.hint}"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{x:Static controls:PatternEditor.TokenGroups}">
+                            <!-- Without a name the group and each token read as their type names. -->
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:TokenGroup}">
+                                    <StackPanel Margin="10,0,10,10">
+                                        <TextBlock Style="{StaticResource Text.Section}" Text="{Binding Title}" />
+                                        <ItemsControl ItemsSource="{Binding Tokens}">
+                                            <ItemsControl.ItemContainerStyle>
+                                                <Style TargetType="ContentPresenter">
+                                                    <Setter Property="AutomationProperties.Name" Value="{Binding Token}" />
+                                                </Style>
+                                            </ItemsControl.ItemContainerStyle>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate DataType="{x:Type vm:TokenItem}">
+                                                    <Button
+                                                        Padding="8,5"
+                                                        HorizontalContentAlignment="Left"
+                                                        Click="OnTokenClicked"
+                                                        Style="{StaticResource Button.Subtle}"
+                                                        Tag="{Binding Token}"
+                                                        ToolTip="{Binding Description}">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock
+                                                                MinWidth="120"
+                                                                Foreground="{DynamicResource Brush.Text.Accent}"
+                                                                Style="{StaticResource Text.Mono}"
+                                                                Text="{Binding Token}" />
+                                                            <TextBlock
+                                                                Margin="10,0,0,0"
+                                                                Style="{StaticResource Text.Caption}"
+                                                                Text="{Binding Description}"
+                                                                TextTrimming="CharacterEllipsis" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+        </Popup>
+    </Grid>
+</UserControl>

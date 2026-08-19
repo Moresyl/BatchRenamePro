@@ -1,0 +1,174 @@
+<UserControl
+    x:Class="BatchRenamePro.App.Views.PresetsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:loc="clr-namespace:BatchRenamePro.App.Localization"
+    xmlns:views="clr-namespace:BatchRenamePro.App.Views"
+    xmlns:vm="clr-namespace:BatchRenamePro.App.ViewModels">
+
+    <!--
+        Presets belong to the rename workspace, so this page shares its view model rather than
+        owning one: saving a preset here and saving one from the rules panel are the same act.
+    -->
+
+    <Border Margin="0,0,16,16" Style="{StaticResource Panel}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Margin="20,18,20,12">
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource Text.Title}" Text="{loc:T presets.title}" />
+                    <TextBlock
+                        Margin="0,4,0,0"
+                        Style="{StaticResource Text.Secondary}"
+                        Text="{loc:T presets.subtitle}" />
+                </StackPanel>
+
+                <StackPanel
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <Button
+                        Command="{Binding ImportPresetCommand}"
+                        Content="{loc:T presets.import}"
+                        Tag="{StaticResource Icon.Import}" />
+                    <Button
+                        Margin="8,0,0,0"
+                        Command="{Binding SavePresetCommand}"
+                        Content="{loc:T presets.saveCurrent}"
+                        Style="{StaticResource Button.Accent}"
+                        Tag="{StaticResource Icon.Save}" />
+                </StackPanel>
+            </Grid>
+
+            <ScrollViewer
+                Grid.Row="1"
+                Padding="20,0,14,20"
+                VerticalScrollBarVisibility="Auto">
+                <Grid>
+                    <ItemsControl ItemsSource="{Binding Presets}">
+                        <!--
+                            An item container with no name of its own is announced as the bound
+                            object's ToString(). The card is a group, so it is named after the preset
+                            it shows and the buttons inside it keep their own names.
+                        -->
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:PresetItem}">
+                                <Border
+                                    Margin="0,0,0,10"
+                                    Padding="16,14"
+                                    Style="{StaticResource Card.Raised}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Border
+                                            Width="38"
+                                            Height="38"
+                                            Margin="0,0,14,0"
+                                            VerticalAlignment="Top"
+                                            Background="{DynamicResource Brush.Accent.Subtle}"
+                                            CornerRadius="{StaticResource Radius.Medium}">
+                                            <Path
+                                                Width="18"
+                                                Height="18"
+                                                Data="{StaticResource Icon.Preset}"
+                                                Style="{StaticResource Icon.Accent}"
+                                                HorizontalAlignment="Center" />
+                                        </Border>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    Style="{StaticResource Text.BodyStrong}"
+                                                    Text="{Binding Name}" />
+                                                <Border
+                                                    Margin="8,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Style="{StaticResource Chip.Info}"
+                                                    Visibility="{Binding IsBuiltIn, Converter={StaticResource BoolToVisibility}}">
+                                                    <TextBlock Style="{StaticResource Text.Caption}" Text="{loc:T presets.builtIn}" />
+                                                </Border>
+                                                <Border Margin="6,0,0,0" VerticalAlignment="Center" Style="{StaticResource Chip}">
+                                                    <TextBlock
+                                                        Style="{StaticResource Text.Caption}"
+                                                        Text="{Binding RuleCount, Converter={StaticResource Format}, ConverterParameter=presets.ruleCount}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock
+                                                Margin="0,5,0,0"
+                                                Style="{StaticResource Text.Secondary}"
+                                                Text="{Binding Description}"
+                                                TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+
+                                        <StackPanel
+                                            Grid.Column="2"
+                                            VerticalAlignment="Center"
+                                            Orientation="Horizontal">
+                                            <Button
+                                                Command="{Binding DataContext.ApplyPresetCommand, RelativeSource={RelativeSource AncestorType=views:PresetsPage}}"
+                                                CommandParameter="{Binding}"
+                                                Content="{loc:T presets.apply}"
+                                                Tag="{StaticResource Icon.Play}" />
+                                            <Button
+                                                Margin="6,0,0,0"
+                                                Command="{Binding DataContext.ExportPresetCommand, RelativeSource={RelativeSource AncestorType=views:PresetsPage}}"
+                                                CommandParameter="{Binding}"
+                                                Style="{StaticResource Button.Icon}"
+                                                Tag="{StaticResource Icon.Export}"
+                                                ToolTip="{loc:T presets.export}" />
+                                            <Button
+                                                Command="{Binding DataContext.DeletePresetCommand, RelativeSource={RelativeSource AncestorType=views:PresetsPage}}"
+                                                CommandParameter="{Binding}"
+                                                Foreground="{DynamicResource Brush.Danger}"
+                                                Style="{StaticResource Button.Icon}"
+                                                Tag="{StaticResource Icon.Delete}"
+                                                ToolTip="{loc:T presets.delete}"
+                                                Visibility="{Binding IsBuiltIn, Converter={StaticResource BoolToVisibilityInverse}}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <StackPanel
+                        Margin="0,70,0,0"
+                        VerticalAlignment="Top"
+                        Visibility="{Binding Presets.Count, Converter={StaticResource CountToVisibilityInverse}}">
+                        <Path
+                            Width="48"
+                            Height="48"
+                            Margin="0,0,0,18"
+                            Data="{StaticResource Icon.Preset}"
+                            Fill="{DynamicResource Brush.Text.Disabled}"
+                            Style="{StaticResource Icon}"
+                            HorizontalAlignment="Center" />
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            Style="{StaticResource Text.Subtitle}"
+                            Text="{loc:T presets.empty.title}" />
+                        <TextBlock
+                            Margin="0,8,0,0"
+                            HorizontalAlignment="Center"
+                            Style="{StaticResource Text.Secondary}"
+                            Text="{loc:T presets.empty.hint}" />
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</UserControl>

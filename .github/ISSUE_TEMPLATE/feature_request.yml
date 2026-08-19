@@ -1,0 +1,61 @@
+name: Feature request
+description: Suggest a rule, a preset, or a change to how something works
+title: '[Feature] '
+labels: [enhancement, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for the suggestion. Write in English or 中文 — either is fine.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: >
+        Describe the renaming job, not the feature. Knowing the actual task often turns up a way to
+        do it with the rules that already exist — and when it does not, it tells us what the feature
+        really has to handle.
+      placeholder: >
+        I get camera exports named IMG_1234.JPG and need them as 2026-08-20 Wedding 01.jpg, grouped
+        by the day they were taken.
+    validations:
+      required: true
+
+  - type: textarea
+    id: today
+    attributes:
+      label: How do you do it today?
+      description: With this app, another tool, or by hand. Say what is awkward about it.
+    validations:
+      required: false
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like to see?
+      description: A new rule, a new token, a setting, a preset — as concrete as you can make it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Before and after
+      description: A few names as they are now and as you would want them.
+      placeholder: |
+        IMG_1234.JPG  ->  2026-08-20 Wedding 01.jpg
+        IMG_1235.JPG  ->  2026-08-20 Wedding 02.jpg
+      render: text
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Would you like to build it?
+      description: >
+        Entirely optional, and a "no" costs nothing. Adding a rule is a well-trodden path —
+        CONTRIBUTING.md walks through all seven steps.
+      options:
+        - label: I would be willing to open a pull request for this
+          required: false

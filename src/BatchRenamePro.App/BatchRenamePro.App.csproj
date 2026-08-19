@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.17763.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>BatchRenamePro</AssemblyName>
+    <RootNamespace>BatchRenamePro.App</RootNamespace>
+    <Description>批量文件改名 Pro — the desktop shell: live preview, rule pipeline editor and undo history.</Description>
+    <Platforms>AnyCPU;x64;ARM64</Platforms>
+
+    <!-- The UI is culture-aware by design: it ships zh-CN and en-US. -->
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+
+    <!-- Nothing consumes the executable's XML docs, so do not demand them on every member. -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <!-- The DWM window attributes are set through [LibraryImport], whose generated marshalling
+         stubs are unsafe by construction. No hand-written unsafe code exists in this project. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BatchRenamePro.Core\BatchRenamePro.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The brand mark, shown on the About page and in the title bar. -->
+    <Resource Include="Assets\app-256.png" />
+  </ItemGroup>
+
+</Project>

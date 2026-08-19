@@ -1,0 +1,122 @@
+<!--
+    The dark palette.
+
+    Declares exactly the same keys as Palette.Light.xaml — see that file for what each one is for.
+    A key added to one file must be added to the other, or the missing brush becomes a XAML load
+    failure the moment someone switches theme.
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <!-- The marker ThemeService looks the active palette up by. -->
+    <sys:Boolean x:Key="Theme.IsDark">True</sys:Boolean>
+
+    <!-- ==== Backgrounds ===================================================================== -->
+
+    <Color x:Key="Color.Bg.Base">#FF202020</Color>
+    <Color x:Key="Color.Bg.Layer">#FF272727</Color>
+
+    <SolidColorBrush x:Key="Brush.Bg.Base" Color="{StaticResource Color.Bg.Base}" />
+    <SolidColorBrush x:Key="Brush.Bg.Layer" Color="#59303030" />
+    <SolidColorBrush x:Key="Brush.Bg.Card" Color="#0DFFFFFF" />
+    <SolidColorBrush x:Key="Brush.Bg.CardHover" Color="#17FFFFFF" />
+    <SolidColorBrush x:Key="Brush.Bg.Control" Color="#0FFFFFFF" />
+    <SolidColorBrush x:Key="Brush.Bg.ControlHover" Color="#17FFFFFF" />
+    <SolidColorBrush x:Key="Brush.Bg.ControlPressed" Color="#08FFFFFF" />
+    <SolidColorBrush x:Key="Brush.Bg.ControlDisabled" Color="#0BFFFFFF" />
+    <SolidColorBrush x:Key="Brush.Bg.Subtle" Color="#0FFFFFFF" />
+    <SolidColorBrush x:Key="Brush.Bg.SubtleHover" Color="#17FFFFFF" />
+    <SolidColorBrush x:Key="Brush.Bg.SubtlePressed" Color="#0AFFFFFF" />
+    <SolidColorBrush x:Key="Brush.Bg.Selected" Color="#1FFFFFFF" />
+    <SolidColorBrush x:Key="Brush.Bg.Scrim" Color="#8C000000" />
+    <SolidColorBrush x:Key="Brush.Bg.Flyout" Color="#FC2C2C2C" />
+    <SolidColorBrush x:Key="Brush.Bg.Smoke" Color="#4D000000" />
+
+    <!-- ==== Text ============================================================================ -->
+
+    <SolidColorBrush x:Key="Brush.Text.Primary" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="Brush.Text.Secondary" Color="#C5FFFFFF" />
+    <SolidColorBrush x:Key="Brush.Text.Tertiary" Color="#87FFFFFF" />
+    <SolidColorBrush x:Key="Brush.Text.Disabled" Color="#5DFFFFFF" />
+    <SolidColorBrush x:Key="Brush.Text.OnAccent" Color="#FF10132B" />
+    <SolidColorBrush x:Key="Brush.Text.Accent" Color="#FFA9BAFF" />
+
+    <!-- ==== Strokes ========================================================================= -->
+
+    <SolidColorBrush x:Key="Brush.Stroke.Subtle" Color="#12FFFFFF" />
+    <SolidColorBrush x:Key="Brush.Stroke.Default" Color="#1AFFFFFF" />
+    <SolidColorBrush x:Key="Brush.Stroke.Strong" Color="#28FFFFFF" />
+    <SolidColorBrush x:Key="Brush.Stroke.Divider" Color="#15FFFFFF" />
+    <SolidColorBrush x:Key="Brush.Stroke.Focus" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="Brush.Stroke.FocusInner" Color="#FF000000" />
+    <SolidColorBrush x:Key="Brush.Stroke.ControlBottom" Color="#18000000" />
+
+    <!-- ==== Accent ========================================================================== -->
+
+    <Color x:Key="Color.Accent.Start">#FF7F98FF</Color>
+    <Color x:Key="Color.Accent.End">#FFB98BFF</Color>
+
+    <SolidColorBrush x:Key="Brush.Accent.Default" Color="#FF8AA0FF" />
+    <SolidColorBrush x:Key="Brush.Accent.Hover" Color="#FF9DAFFF" />
+    <SolidColorBrush x:Key="Brush.Accent.Pressed" Color="#FF7C92F0" />
+    <SolidColorBrush x:Key="Brush.Accent.Disabled" Color="#FF3F4560" />
+    <SolidColorBrush x:Key="Brush.Accent.Subtle" Color="#268AA0FF" />
+    <SolidColorBrush x:Key="Brush.Accent.SubtleHover" Color="#3D8AA0FF" />
+
+    <LinearGradientBrush x:Key="Brush.Accent.Gradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0" Color="{StaticResource Color.Accent.Start}" />
+        <GradientStop Offset="1" Color="{StaticResource Color.Accent.End}" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="Brush.Accent.GradientHover" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Offset="0" Color="#FF93A9FF" />
+        <GradientStop Offset="1" Color="#FFC79EFF" />
+    </LinearGradientBrush>
+
+    <!-- ==== Status ========================================================================== -->
+
+    <SolidColorBrush x:Key="Brush.Success" Color="#FF6CCB5F" />
+    <SolidColorBrush x:Key="Brush.Success.Bg" Color="#1F6CCB5F" />
+    <SolidColorBrush x:Key="Brush.Success.Stroke" Color="#4D6CCB5F" />
+
+    <SolidColorBrush x:Key="Brush.Warning" Color="#FFFCE100" />
+    <SolidColorBrush x:Key="Brush.Warning.Bg" Color="#1FFCE100" />
+    <SolidColorBrush x:Key="Brush.Warning.Stroke" Color="#4DFCE100" />
+
+    <SolidColorBrush x:Key="Brush.Danger" Color="#FFFF99A4" />
+    <SolidColorBrush x:Key="Brush.Danger.Bg" Color="#1FFF99A4" />
+    <SolidColorBrush x:Key="Brush.Danger.Stroke" Color="#4DFF99A4" />
+    <SolidColorBrush x:Key="Brush.Danger.Hover" Color="#FFFFB1BA" />
+
+    <SolidColorBrush x:Key="Brush.Info" Color="#FF8AA0FF" />
+    <SolidColorBrush x:Key="Brush.Info.Bg" Color="#1F8AA0FF" />
+    <SolidColorBrush x:Key="Brush.Info.Stroke" Color="#4D8AA0FF" />
+
+    <!-- ==== Preview diff ==================================================================== -->
+
+    <SolidColorBrush x:Key="Brush.Diff.Added" Color="#4D6CCB5F" />
+    <SolidColorBrush x:Key="Brush.Diff.Removed" Color="#40FF99A4" />
+
+    <!-- ==== Elevation ======================================================================= -->
+
+    <Color x:Key="Color.Shadow">#FF000000</Color>
+
+    <DropShadowEffect
+        x:Key="Effect.Shadow.Card"
+        BlurRadius="14"
+        Direction="270"
+        Opacity="0.28"
+        ShadowDepth="2"
+        Color="{StaticResource Color.Shadow}" />
+
+    <DropShadowEffect
+        x:Key="Effect.Shadow.Flyout"
+        BlurRadius="28"
+        Direction="270"
+        Opacity="0.55"
+        ShadowDepth="6"
+        Color="{StaticResource Color.Shadow}" />
+
+</ResourceDictionary>

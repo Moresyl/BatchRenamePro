@@ -1,0 +1,49 @@
+<Application
+    x:Class="BatchRenamePro.App.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:convert="clr-namespace:BatchRenamePro.App.Converters">
+
+    <!--
+        There is no StartupUri: the window is built by the container in App.OnStartup so that it can
+        be handed its view model, and so the theme and the language are settled before any markup
+        that depends on them is parsed.
+    -->
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--
+                    Palette first: everything after it refers to the brushes it defines. The light
+                    palette is the one compiled in; ThemeService swaps this entry for the dark one at
+                    startup and whenever the theme changes, which is why every reference to a palette
+                    key in this application is a DynamicResource.
+                -->
+                <ResourceDictionary Source="Themes/Palette.Light.xaml" />
+                <ResourceDictionary Source="Themes/Controls.xaml" />
+                <ResourceDictionary Source="Themes/RuleEditors.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!--
+                Converters live in the root dictionary rather than a merged one so that pages can
+                reach them with StaticResource: a merged dictionary can only see itself and its own
+                nested dictionaries, never its siblings.
+            -->
+            <convert:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+            <convert:BoolToVisibilityConverter x:Key="BoolToVisibilityInverse" Invert="True" />
+            <convert:BoolToVisibilityConverter x:Key="BoolToVisibilityHidden" UseHidden="True" />
+            <convert:NullToVisibilityConverter x:Key="NullToVisibility" />
+            <convert:NullToVisibilityConverter x:Key="NullToVisibilityInverse" Invert="True" />
+            <convert:CountToVisibilityConverter x:Key="CountToVisibility" />
+            <convert:CountToVisibilityConverter x:Key="CountToVisibilityInverse" Invert="True" />
+            <convert:EqualsConverter x:Key="Equals" />
+            <convert:EqualsToVisibilityConverter x:Key="EqualsToVisibility" />
+            <convert:EnumTextConverter x:Key="EnumText" />
+            <convert:FormatConverter x:Key="Format" />
+            <convert:LocalizeConverter x:Key="Localize" />
+            <convert:FileSizeConverter x:Key="FileSize" />
+            <convert:RelativeTimeConverter x:Key="RelativeTime" />
+            <convert:ResourceConverter x:Key="Resource" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

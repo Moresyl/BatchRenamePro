@@ -1,0 +1,89 @@
+name: Bug report
+description: Something renamed wrongly, crashed, or did not do what the preview said
+title: '[Bug] '
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this. Write in English or 中文 — either is fine.
+
+        **If this is a security issue, please do not file it here.** Use
+        [private reporting](https://github.com/batchrenamepro/batchrenamepro/security/advisories/new)
+        instead — see [SECURITY.md](https://github.com/batchrenamepro/batchrenamepro/blob/main/SECURITY.md).
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you expect, and what did you get instead?
+      placeholder: The preview showed `photo_001.jpg` but the file ended up named `photo_1.jpg`.
+    validations:
+      required: true
+
+  - type: textarea
+    id: rules
+    attributes:
+      label: The rules you had set up
+      description: >
+        A rename bug is nearly always reproducible from the rules plus a couple of example names, so
+        this is the single most useful thing you can give us. List each rule and its settings, or
+        paste the preset JSON from `%APPDATA%\BatchRenamePro\Presets`.
+      placeholder: |
+        1. Pattern: {name}_{index:000}
+        2. Case: lower
+        Scope on both: base name only
+        Conflict policy: auto-number
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: names
+    attributes:
+      label: Example file names
+      description: Two or three original names that show the problem, exactly as they appear.
+      placeholder: |
+        Holiday Photo (1).JPG
+        Holiday Photo (2).JPG
+      render: text
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: 'From the About page — there is a button there that copies version and environment.'
+      placeholder: 2.0.0
+    validations:
+      required: true
+
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      description: 'Run `winver`, or paste the line the About page copied.'
+      placeholder: Windows 11 24H2 (26100.1742), x64
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reproducible
+    attributes:
+      label: Does it happen every time?
+      options:
+        - Every time
+        - Sometimes
+        - It happened once
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: >
+        Screenshots of the preview are very welcome. If the app crashed, the newest file in
+        `%APPDATA%\BatchRenamePro\Logs` will have the details — check it for anything private before
+        pasting, since it can contain file names.
