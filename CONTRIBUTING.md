@@ -133,6 +133,18 @@ rules plus one or two example names*, so those two things are worth more than a 
 
 Security issues do **not** go in the tracker. See [SECURITY.md](SECURITY.md).
 
+## Forking it under another name
+
+The repository slug is baked into badge URLs, issue-template links, the security policy, the
+changelog's compare links and the About page's constant — 22 places. One command moves all of them:
+
+```powershell
+pwsh tools\set-repository.ps1 -Slug your-org/your-fork
+```
+
+Add `-WhatIf` to see what it would touch first. Rebuild afterwards: the About page reads the URL from
+a compiled constant, not from a file.
+
 ## Code of conduct
 
 Participating means agreeing to the [Code of Conduct](CODE_OF_CONDUCT.md). It is short, and it is
