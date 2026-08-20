@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.IO;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Threading;
 using BatchRenamePro.App.Localization;
@@ -98,6 +99,11 @@ public partial class App : Application
         services.AddSingleton<ILocalizer>(Localizer.Current);
         services.AddSingleton<IThemeService, ThemeService>();
         services.AddSingleton<INotificationService, NotificationService>();
+        services.AddSingleton<IExternalLauncher, ExternalLauncher>();
+        services.AddSingleton(new HttpClient { Timeout = TimeSpan.FromSeconds(15) });
+        services.AddSingleton<IUpdateService>(provider => new GitHubUpdateService(
+            provider.GetRequiredService<HttpClient>(),
+            ProductLinks.Repository));
         services.AddSingleton<DialogHost>();
         services.AddSingleton<IDialogService, DialogService>();
 
@@ -107,6 +113,7 @@ public partial class App : Application
         services.AddSingleton<RenameViewModel>();
         services.AddSingleton<HistoryViewModel>();
         services.AddSingleton<SettingsViewModel>();
+        services.AddSingleton<UpdateViewModel>();
         services.AddSingleton<AboutViewModel>();
         services.AddSingleton<ShellViewModel>();
 

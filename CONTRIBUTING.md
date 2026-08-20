@@ -12,7 +12,7 @@ You need the [.NET 10 SDK](https://dotnet.microsoft.com/download) and Windows 10
 `global.json` pins the SDK band, so `dotnet` will tell you plainly if yours is too old.
 
 ```powershell
-git clone https://github.com/batchrenamepro/batchrenamepro.git
+git clone https://github.com/Moresyl/BatchRenamePro.git
 cd batchrenamepro
 dotnet restore BatchRenamePro.sln
 dotnet build   BatchRenamePro.sln -c Release

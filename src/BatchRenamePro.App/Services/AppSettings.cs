@@ -67,6 +67,12 @@ public sealed class AppSettings
     /// <summary>Whether the preview hides rows the rules did not change.</summary>
     public bool ShowOnlyChanged { get; set; }
 
+    /// <summary>Whether the public GitHub release channel is checked after startup.</summary>
+    public bool CheckForUpdatesOnStartup { get; set; } = true;
+
+    /// <summary>A release the user chose not to be reminded about.</summary>
+    public string DismissedUpdateVersion { get; set; } = string.Empty;
+
     /// <summary>The folder the last "add folder" started from, so the picker opens where you left off.</summary>
     public string LastFolder { get; set; } = string.Empty;
 
@@ -95,6 +101,9 @@ public sealed class AppSettings
         if (!Enum.IsDefined(ConflictPolicy)) ConflictPolicy = ConflictPolicy.Block;
 
         Culture = string.IsNullOrWhiteSpace(Culture) ? string.Empty : Culture.Trim();
+        DismissedUpdateVersion = string.IsNullOrWhiteSpace(DismissedUpdateVersion)
+            ? string.Empty
+            : DismissedUpdateVersion.Trim();
         HistoryLimit = Math.Clamp(HistoryLimit, 5, 500);
 
         // Small enough to be awkward is worse than the default; a hand-edited 40x10 window is unusable.

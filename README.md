@@ -6,8 +6,8 @@
 
 **A batch file renamer for Windows that shows you exactly what it is about to do — and can undo it afterwards.**
 
-[![CI](https://github.com/batchrenamepro/batchrenamepro/actions/workflows/ci.yml/badge.svg)](https://github.com/batchrenamepro/batchrenamepro/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/batchrenamepro/batchrenamepro?include_prereleases&sort=semver)](https://github.com/batchrenamepro/batchrenamepro/releases)
+[![CI](https://github.com/Moresyl/BatchRenamePro/actions/workflows/ci.yml/badge.svg)](https://github.com/Moresyl/BatchRenamePro/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Moresyl/BatchRenamePro?include_prereleases&sort=semver)](https://github.com/Moresyl/BatchRenamePro/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4.svg)](https://dotnet.microsoft.com/)
 [![Windows](https://img.shields.io/badge/platform-Windows%2010%201809%2B-0078D4.svg)](#requirements)
@@ -48,11 +48,12 @@ does run is a two-phase transaction that rolls itself back if any step fails.
 | **Tokens** | 22 placeholders — name, extension, parent folder, index, total, size, created/modified dates with custom formats, GUID, random suffix — with an in-app reference. |
 | **Bilingual and accessible** | Ships zh-CN and en-US, switchable at runtime with no restart. Every interactive element is named for screen readers, verified by an automated UI Automation sweep. |
 | **Modern Windows shell** | Custom title bar, Mica/Acrylic backdrop, light/dark/system theming, Per-Monitor V2 DPI, rounded corners on Windows 11 with automatic fallback on Windows 10. |
-| **Private by construction** | No telemetry, no network calls, no elevation. History and logs are plain files under `%LOCALAPPDATA%`. |
+| **Release-aware** | Optionally checks GitHub Releases at startup, shows the exact release notes in-app, and opens the matching GitHub page with one click. It never downloads or runs an update itself. |
+| **Private by construction** | No telemetry and no elevation. The only optional network call reads public GitHub Release metadata; history and logs stay under `%LOCALAPPDATA%`. |
 
 ## Install
 
-Download the archive for your machine from the [latest release](https://github.com/batchrenamepro/batchrenamepro/releases/latest),
+Download the archive for your machine from the [latest release](https://github.com/Moresyl/BatchRenamePro/releases/latest),
 unzip it anywhere, and run `BatchRenamePro.exe`. The builds are self-contained — no .NET install
 required.
 
@@ -111,7 +112,7 @@ conflict policy decides:
 ## Build from source
 
 ```powershell
-git clone https://github.com/batchrenamepro/batchrenamepro.git
+git clone https://github.com/Moresyl/BatchRenamePro.git
 cd batchrenamepro
 dotnet restore BatchRenamePro.sln
 dotnet build BatchRenamePro.sln -c Release
@@ -157,8 +158,9 @@ BatchRenamePro.App         WPF, MVVM, dependency-injected
 
 Two rules keep the layers honest:
 
-1. **Core never references WPF.** It targets plain `net10.0` and is the only project with tests.
-   Anything that can be decided without a window is decided there.
+1. **Core never references WPF.** It targets plain `net10.0`; rename-engine tests remain platform
+   neutral, while a separate Windows test project covers release integration. Anything that can be
+   decided without a window is decided in Core.
 2. **The planner is the single gate.** Rules never touch the file system; they transform strings.
    Validation, conflict detection and ordering all happen in one place, so the preview and the
    execution can never disagree about what is going to happen.
@@ -168,7 +170,11 @@ Adding a rule means implementing `IRenameRule`, registering it in `RuleCatalog`,
 
 ## Data and privacy
 
-The app runs as a normal user, never elevates, and makes no network requests of any kind.
+The app runs as a normal user and never elevates. If **Check for updates at startup** is enabled, it
+makes one anonymous request to the configured public GitHub repository's latest Release endpoint.
+That response supplies only the version, publication date and release notes shown in the app. The
+setting can be disabled, and no file names, history, presets, logs, identifiers or usage data are
+uploaded.
 
 Everything it writes lives in one folder, `%APPDATA%\BatchRenamePro`:
 

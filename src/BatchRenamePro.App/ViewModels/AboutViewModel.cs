@@ -1,31 +1,31 @@
-using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using BatchRenamePro.App.Localization;
+using BatchRenamePro.App.Services;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.Logging;
 
 namespace BatchRenamePro.App.ViewModels;
 
 /// <summary>The about page: version, licence, and the links an open-source project needs.</summary>
 public sealed partial class AboutViewModel
 {
-    /// <summary>Where the project lives.</summary>
-    public const string RepositoryUrl = "https://github.com/batchrenamepro/batchrenamepro";
-
-    private readonly ILogger<AboutViewModel> _logger;
+    private readonly IExternalLauncher _launcher;
 
     /// <summary>Creates the page.</summary>
     /// <param name="tokens">The token reference shown on this page.</param>
-    /// <param name="logger">Diagnostics.</param>
-    public AboutViewModel(TokenPickerViewModel tokens, ILogger<AboutViewModel> logger)
+    /// <param name="update">The release state shared with the title bar.</param>
+    /// <param name="launcher">Opens public project links.</param>
+    public AboutViewModel(TokenPickerViewModel tokens, UpdateViewModel update, IExternalLauncher launcher)
     {
         Tokens = tokens;
-        _logger = logger;
+        Update = update;
+        _launcher = launcher;
     }
 
     /// <summary>The token reference, shown here as the app's built-in documentation.</summary>
     public TokenPickerViewModel Tokens { get; }
+
+    /// <summary>Update information and commands.</summary>
+    public UpdateViewModel Update { get; }
 
     /// <summary>The product version, without the build metadata a commit hash adds.</summary>
     public static string Version { get; } = ReadVersion();
@@ -37,38 +37,18 @@ public sealed partial class AboutViewModel
     public static string OperatingSystem => System.Runtime.InteropServices.RuntimeInformation.OSDescription;
 
     /// <summary>The project's home page.</summary>
-    public static string Repository => RepositoryUrl;
+    public static string Repository => ProductLinks.Repository;
 
     /// <summary>Where to report a bug.</summary>
-    public static string Issues => RepositoryUrl + "/issues";
+    public static string Issues => ProductLinks.Issues;
 
     /// <summary>The licence text.</summary>
-    public static string License => RepositoryUrl + "/blob/main/LICENSE";
+    public static string License => ProductLinks.License;
 
     /// <summary>Opens a link in the default browser.</summary>
     /// <param name="url">The address to open.</param>
     [RelayCommand]
-    private void OpenLink(string? url)
-    {
-        if (string.IsNullOrWhiteSpace(url)) return;
-
-        // Only http(s) is ever launched from here: these strings are constants today, but an about
-        // page that shells out to whatever it is handed is one localisation file away from trouble.
-        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
-            (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
-        {
-            return;
-        }
-
-        try
-        {
-            using var process = Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true });
-        }
-        catch (Exception error) when (error is IOException or System.ComponentModel.Win32Exception)
-        {
-            _logger.LogWarning(error, "Could not open {Url}", uri);
-        }
-    }
+    private void OpenLink(string? url) => _launcher.Open(url);
 
     /// <summary>Copies the version and environment, for pasting into a bug report.</summary>
     /// <param name="localizer">Supplies the app name.</param>

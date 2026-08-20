@@ -148,6 +148,24 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.checkUpdates}" />
+                                    <TextBlock Style="{StaticResource Setting.Hint}" Text="{loc:T settings.checkUpdates.hint}" />
+                                </StackPanel>
+                                <ToggleButton
+                                    Grid.Column="1"
+                                    AutomationProperties.Name="{loc:T settings.checkUpdates}"
+                                    IsChecked="{Binding CheckForUpdatesOnStartup}"
+                                    Style="{StaticResource Switch}" />
+                            </Grid>
+
+                            <Border Style="{StaticResource Divider}" />
+
+                            <Grid Style="{StaticResource Setting}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
                                     <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.confirmBeforeRun}" />
                                     <TextBlock Style="{StaticResource Setting.Hint}" Text="{loc:T settings.confirmBeforeRun.hint}" />
                                 </StackPanel>

@@ -60,7 +60,7 @@ representative at an online or offline event.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement through a
-[private report on the repository](https://github.com/batchrenamepro/batchrenamepro/security/advisories/new)
+[private report on the repository](https://github.com/Moresyl/BatchRenamePro/security/advisories/new)
 or by contacting a maintainer directly. All complaints will be reviewed and
 investigated promptly and fairly.
 

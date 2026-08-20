@@ -53,6 +53,7 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     /// <param name="rename">The rename page.</param>
     /// <param name="history">The history page.</param>
     /// <param name="settingsPage">The settings page.</param>
+    /// <param name="update">Application release state.</param>
     /// <param name="about">The about page.</param>
     /// <param name="dialogs">The dialog host every page shares.</param>
     /// <param name="notifications">The toast host every page shares.</param>
@@ -63,6 +64,7 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
         RenameViewModel rename,
         HistoryViewModel history,
         SettingsViewModel settingsPage,
+        UpdateViewModel update,
         AboutViewModel about,
         DialogHost dialogs,
         INotificationService notifications,
@@ -76,6 +78,7 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
         Rename = rename;
         History = history;
         Settings = settingsPage;
+        Update = update;
         About = about;
         Dialogs = dialogs;
         Notifications = notifications;
@@ -99,6 +102,9 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
 
     /// <summary>The settings page.</summary>
     public SettingsViewModel Settings { get; }
+
+    /// <summary>The update state shared by the title bar and About page.</summary>
+    public UpdateViewModel Update { get; }
 
     /// <summary>The about page.</summary>
     public AboutViewModel About { get; }
@@ -135,6 +141,7 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     {
         await Rename.LoadPresetsAsync().ConfigureAwait(true);
         await History.LoadAsync().ConfigureAwait(true);
+        await Update.CheckOnStartupAsync().ConfigureAwait(true);
     }
 
     /// <summary>Switches page.</summary>
@@ -185,6 +192,7 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
 
         Rename.Dispose();
         History.Dispose();
+        Update.Dispose();
         About.Tokens.Dispose();
     }
 

@@ -3,9 +3,9 @@
     Points the project at its real GitHub repository.
 
 .DESCRIPTION
-    The repository slug appears in eighteen places — badge URLs, issue-template links, the security
-    policy, the changelog's compare links and the About page's constant. This rewrites all of them
-    at once so none is left behind pointing at the placeholder.
+    The repository slug appears across badge URLs, issue-template links, the security policy,
+    changelog compare links and the application's release-channel constant. This rewrites all of
+    them at once so neither the UI nor update checks point at the placeholder.
 
     Run it after creating the repository on GitHub, then commit the result.
 
@@ -59,4 +59,4 @@ foreach ($file in $files) {
 
 Write-Output ''
 Write-Output "$changed occurrence(s) of '$placeholder' -> '$Slug'"
-Write-Output 'Review with `git diff`, then rebuild: the About page reads the URL from a constant.'
+Write-Output 'Review with `git diff`, then rebuild: About links and update checks share this URL.'

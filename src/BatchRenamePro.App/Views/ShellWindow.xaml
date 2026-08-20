@@ -117,6 +117,14 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Button
+                        AutomationProperties.Name="{Binding Update.BadgeText}"
+                        Command="{Binding Update.OpenReleaseCommand}"
+                        Style="{StaticResource Button.Window}"
+                        Tag="{StaticResource Icon.Refresh}"
+                        ToolTip="{Binding Update.BadgeText}"
+                        Visibility="{Binding Update.ShowBadge, Converter={StaticResource BoolToVisibility}}" />
+
                     <!-- The glyph shows where the click goes, not where it is: dark theme, sun. -->
                     <Button Command="{Binding ToggleThemeCommand}" ToolTip="{loc:T action.toggleTheme}">
                         <Button.Style>

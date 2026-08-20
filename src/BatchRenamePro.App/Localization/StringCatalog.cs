@@ -338,6 +338,8 @@ internal static class StringCatalog
         ["settings.language.hint"] = "切换后立即生效，不用重启。",
         ["settings.navigationExpanded"] = "启动时展开侧边导航",
         ["settings.section.defaults"] = "默认行为",
+        ["settings.checkUpdates"] = "启动时检查更新",
+        ["settings.checkUpdates.hint"] = "仅访问 GitHub Releases；不会上传文件名、历史记录或使用数据。",
         ["settings.confirmBeforeRun"] = "开始重命名前先确认",
         ["settings.confirmBeforeRun.hint"] = "关掉之后点「开始重命名」会直接执行，但仍然可以撤销。",
         ["settings.recursive"] = "默认包含子文件夹",
@@ -367,6 +369,22 @@ internal static class StringCatalog
         ["about.tokens"] = "可用变量速查",
         ["about.tokens.hint"] = "这些变量可以写进「按模板重命名」的模板里，点一下即可复制。",
         ["about.copyright"] = "以 MIT 许可证开源，欢迎自由使用、修改和分发。",
+
+        // ---- updates ----
+        ["update.title"] = "软件更新",
+        ["update.current"] = "当前版本",
+        ["update.latest"] = "最新版本",
+        ["update.check"] = "检查更新",
+        ["update.checking"] = "正在检查…",
+        ["update.notes"] = "本次更新",
+        ["update.notes.empty"] = "这个版本没有提供更新说明。",
+        ["update.openGithub"] = "前往 GitHub",
+        ["update.dismiss"] = "忽略此版本",
+        ["update.badge"] = "发现新版本 {0}，点击打开 GitHub",
+        ["update.availableToast"] = "Batch Rename Pro {0} 已发布。",
+        ["update.upToDate"] = "当前已是最新版本。",
+        ["update.failed"] = "检查更新失败，请稍后重试。",
+        ["update.unconfigured"] = "尚未配置 GitHub 仓库，暂时无法检查更新。",
 
         // ---- generic ----
         ["common.yes"] = "是",
@@ -706,6 +724,8 @@ internal static class StringCatalog
         ["settings.language.hint"] = "Applies immediately, no restart needed.",
         ["settings.navigationExpanded"] = "Start with the sidebar expanded",
         ["settings.section.defaults"] = "Defaults",
+        ["settings.checkUpdates"] = "Check for updates at startup",
+        ["settings.checkUpdates.hint"] = "Only GitHub Releases is contacted; file names, history, and usage data are never uploaded.",
         ["settings.confirmBeforeRun"] = "Ask before renaming",
         ["settings.confirmBeforeRun.hint"] = "With this off, Rename runs immediately — you can still undo it.",
         ["settings.recursive"] = "Include subfolders by default",
@@ -735,6 +755,22 @@ internal static class StringCatalog
         ["about.tokens"] = "Variable reference",
         ["about.tokens.hint"] = "These go inside the pattern of the “Rename with a pattern” rule.",
         ["about.copyright"] = "Open source under the MIT Licence — use it, change it, ship it.",
+
+        // ---- updates ----
+        ["update.title"] = "Software updates",
+        ["update.current"] = "Current version",
+        ["update.latest"] = "Latest version",
+        ["update.check"] = "Check for updates",
+        ["update.checking"] = "Checking…",
+        ["update.notes"] = "What's new",
+        ["update.notes.empty"] = "No release notes were provided for this version.",
+        ["update.openGithub"] = "Open GitHub",
+        ["update.dismiss"] = "Ignore this version",
+        ["update.badge"] = "Version {0} is available; open GitHub",
+        ["update.availableToast"] = "Batch Rename Pro {0} is available.",
+        ["update.upToDate"] = "You already have the latest version.",
+        ["update.failed"] = "The update check failed. Please try again later.",
+        ["update.unconfigured"] = "No GitHub repository is configured, so updates cannot be checked yet.",
 
         // ---- generic ----
         ["common.yes"] = "Yes",

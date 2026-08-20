@@ -6,8 +6,8 @@
 
 **Windows 批量改名工具：动手之前先看清它要做什么，做完之后还能撤回。**
 
-[![CI](https://github.com/batchrenamepro/batchrenamepro/actions/workflows/ci.yml/badge.svg)](https://github.com/batchrenamepro/batchrenamepro/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/batchrenamepro/batchrenamepro?include_prereleases&sort=semver)](https://github.com/batchrenamepro/batchrenamepro/releases)
+[![CI](https://github.com/Moresyl/BatchRenamePro/actions/workflows/ci.yml/badge.svg)](https://github.com/Moresyl/BatchRenamePro/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Moresyl/BatchRenamePro?include_prereleases&sort=semver)](https://github.com/Moresyl/BatchRenamePro/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4.svg)](https://dotnet.microsoft.com/)
 [![Windows](https://img.shields.io/badge/platform-Windows%2010%201809%2B-0078D4.svg)](#运行环境)
@@ -45,11 +45,12 @@
 | **占位符** | 22 个占位符——文件名、扩展名、上级文件夹、序号、总数、大小、创建/修改时间（可自定义格式）、GUID、随机后缀——程序内自带速查表。 |
 | **双语与无障碍** | 内置简体中文与 English，运行中切换、无需重启。所有可交互元素都为读屏软件命名，并由自动化 UI Automation 巡检验证。 |
 | **现代 Windows 外观** | 自绘标题栏、Mica / 亚克力材质、浅色 / 深色 / 跟随系统、Per-Monitor V2 高 DPI；Win11 圆角，Win10 自动降级。 |
-| **天生不联网** | 无遥测、无网络请求、不提权。历史与日志都是 `%APPDATA%` 下的普通文件。 |
+| **自动感知新版本** | 可在启动后检查 GitHub Releases，在软件内显示完整更新说明，并一键打开对应发布页；客户端不会自行下载或执行更新。 |
+| **隐私边界清晰** | 无遥测、不提权；唯一可选联网行为是读取公开 GitHub Release 元数据，历史与日志仍只保存在 `%APPDATA%`。 |
 
 ## 安装
 
-到 [最新发布页](https://github.com/batchrenamepro/batchrenamepro/releases/latest) 下载对应你电脑的压缩包，
+到 [最新发布页](https://github.com/Moresyl/BatchRenamePro/releases/latest) 下载对应你电脑的压缩包，
 解压到任意位置，运行 `BatchRenamePro.exe` 即可。发布版为自包含构建，**无需预装 .NET**。
 
 | 下载 | 适用机型 |
@@ -105,7 +106,7 @@ Get-FileHash .\BatchRenamePro-win-x64.zip -Algorithm SHA256
 ## 从源码构建
 
 ```powershell
-git clone https://github.com/batchrenamepro/batchrenamepro.git
+git clone https://github.com/Moresyl/BatchRenamePro.git
 cd batchrenamepro
 dotnet restore BatchRenamePro.sln
 dotnet build BatchRenamePro.sln -c Release
@@ -149,7 +150,7 @@ BatchRenamePro.App         WPF、MVVM、依赖注入
 
 两条约束保证分层不塌：
 
-1. **Core 永不引用 WPF。** 它的目标框架是纯 `net10.0`，也是唯一有测试的项目。凡是不需要窗口就能定下来的事，都在这里定。
+1. **Core 永不引用 WPF。** 它的目标框架是纯 `net10.0`；改名引擎测试保持跨平台，另有独立 Windows 测试项目覆盖 Release 集成。凡是不需要窗口就能定下来的事，都放在 Core。
 2. **规划器是唯一的关口。** 规则不碰文件系统，只做字符串变换；校验、冲突检测、排序全部集中在一处。
    所以"预览显示的"和"实际执行的"不可能不一致。
 
@@ -158,7 +159,9 @@ BatchRenamePro.App         WPF、MVVM、依赖注入
 
 ## 数据与隐私
 
-程序以普通用户权限运行，从不提权，也不发起任何网络请求。
+程序以普通用户权限运行，从不提权。开启“启动时检查更新”后，只会匿名请求已配置公开 GitHub 仓库的
+latest Release 接口，用于取得界面里显示的版本号、发布日期和更新说明；这个选项可以关闭，并且不会上传
+文件名、历史记录、预设、日志、设备标识或使用数据。
 
 它写入的所有内容都在同一个目录下：`%APPDATA%\BatchRenamePro`
 

@@ -115,6 +115,13 @@ public sealed partial class SettingsViewModel : ObservableObject
         set => Write(value, ConfirmBeforeRun, flag => _settings.Current.ConfirmBeforeRun = flag);
     }
 
+    /// <summary>Whether the app quietly checks the public GitHub release channel after startup.</summary>
+    public bool CheckForUpdatesOnStartup
+    {
+        get => _settings.Current.CheckForUpdatesOnStartup;
+        set => Write(value, CheckForUpdatesOnStartup, flag => _settings.Current.CheckForUpdatesOnStartup = flag);
+    }
+
     /// <summary>Whether adding a folder pulls in its subfolders.</summary>
     public bool RecursiveByDefault
     {

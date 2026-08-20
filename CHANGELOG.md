@@ -7,7 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- A GitHub Releases update centre inspired by cc-switch: optional delayed startup checks, a title-bar
+  notification, release notes and publication date on the About page, manual checks, persistent
+  “ignore this version”, and one-click opening of the exact GitHub Release.
+- A separately testable application update channel with strict repository parsing, stable-release
+  validation, semantic-version comparison, trusted release URL construction and request timeouts.
+
+### Changed
+
+- The privacy model now permits one narrowly scoped, user-configurable request to GitHub's public
+  Releases API. It sends no file names, history, presets, telemetry or usage data.
 
 ## [2.0.0] — 2026-08-20
 
@@ -76,5 +87,5 @@ Presets and history from 1.x are not carried over — there was no on-disk forma
   timestamp only advances every 15ms or so — sorted arbitrarily, so the history page could show
   batches out of order and pruning could delete the wrong ones.
 
-[Unreleased]: https://github.com/batchrenamepro/batchrenamepro/compare/v2.0.0...HEAD
-[2.0.0]: https://github.com/batchrenamepro/batchrenamepro/releases/tag/v2.0.0
+[Unreleased]: https://github.com/Moresyl/BatchRenamePro/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/Moresyl/BatchRenamePro/releases/tag/v2.0.0
