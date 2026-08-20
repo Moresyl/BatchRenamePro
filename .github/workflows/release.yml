@@ -28,10 +28,10 @@ jobs:
         rid: [win-x64, win-arm64, win-x86]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
 
@@ -79,7 +79,7 @@ jobs:
           Compress-Archive -Path "$staging/*" -DestinationPath "dist/BatchRenamePro-$rid.zip"
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: package-${{ matrix.rid }}
           path: dist/*.zip
@@ -97,10 +97,10 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Download the packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: package-*
           path: dist
@@ -154,7 +154,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Create the release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             dist/*.zip

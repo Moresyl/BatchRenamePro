@@ -69,7 +69,7 @@ public static class EnumOptions
         var localizer = Localizer.Current;
         if (ReferenceEquals(_watching, localizer)) return;
 
-        if (_watching is not null) _watching.PropertyChanged -= OnLanguageChanged;
+        _watching?.PropertyChanged -= OnLanguageChanged;
         localizer.PropertyChanged += OnLanguageChanged;
         _watching = localizer;
     }
