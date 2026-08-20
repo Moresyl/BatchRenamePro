@@ -1,18 +1,25 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Interop;
 using BatchRenamePro.App.Interop;
 using BatchRenamePro.App.Services;
 using BatchRenamePro.App.ViewModels;
 
 namespace BatchRenamePro.App.Views;
 
-/// <summary>The application window: title bar, navigation rail, pages, dialogs and toasts.</summary>
+#pragma warning disable CA1001 // A window releases what it owns in OnClosed; Window is not IDisposable.
+
+/// <summary>The application window: title bar, navigation tabs, pages, dialogs and toasts.</summary>
 public partial class ShellWindow : Window
 {
     private readonly ISettingsService _settings;
     private readonly IThemeService _theme;
     private readonly ShellViewModel _model;
+
+    private TrayIcon? _tray;
 
     /// <summary>Creates the window.</summary>
     /// <param name="model">The shell view model, supplied by the container.</param>
@@ -41,8 +48,9 @@ public partial class ShellWindow : Window
     {
         base.OnSourceInitialized(e);
 
-        // Without this a chromeless window maximizes to the whole monitor and hides the taskbar.
-        WindowFrame.TrackMaximizeBounds(this);
+        // The window cannot be resized, so this is the one chance to notice it does not fit.
+        WindowFrame.FitToWorkArea(this);
+        WindowFrame.ForbidResizing(this);
         ApplyFrame();
     }
 
@@ -51,10 +59,9 @@ public partial class ShellWindow : Window
     {
         base.OnStateChanged(e);
 
-        var maximized = WindowState == WindowState.Maximized;
-
-        MaximizeButton.Tag = TryFindResource(maximized ? "Icon.Window.Restore" : "Icon.Window.Maximize");
-        MaximizeButton.ToolTip = Localization.Localizer.Current[maximized ? "window.restore" : "window.maximize"];
+        // Minimized and Normal are the only two states a fixed-size window has, so there is nothing
+        // to record and no caption button to relabel — only the one setting to honour.
+        if (WindowState == WindowState.Minimized && _settings.Current.MinimizeToTray) HideToTray();
     }
 
     /// <inheritdoc />
@@ -64,7 +71,35 @@ public partial class ShellWindow : Window
         _model.Dialogs.PropertyChanged -= OnDialogChanged;
         _model.Dispose();
 
+        if (_tray is not null)
+        {
+            _tray.Selected -= OnTraySelected;
+            _tray.ContextMenuRequested -= OnTrayContextMenu;
+            _tray.Dispose();
+            _tray = null;
+        }
+
         base.OnClosed(e);
+    }
+
+    /// <summary>The notification-area icon, created the first time the window has to disappear.</summary>
+    /// <remarks>
+    /// Deliberately not created at startup. An icon that sits in the notification area for the whole
+    /// session is a different feature from one that stands in for a hidden window, and a user who
+    /// never turns the setting on should never see one.
+    /// </remarks>
+    private TrayIcon Tray
+    {
+        get
+        {
+            if (_tray is not null) return _tray;
+
+            _tray = new TrayIcon(Localization.Localizer.Current["app.name"]);
+            _tray.Selected += OnTraySelected;
+            _tray.ContextMenuRequested += OnTrayContextMenu;
+
+            return _tray;
+        }
     }
 
     private void ApplyFrame() =>
@@ -83,10 +118,52 @@ public partial class ShellWindow : Window
             System.Windows.Threading.DispatcherPriority.Input);
     }
 
-    private void OnMinimize(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+    private void HideToTray()
+    {
+        var tray = Tray;
+        tray.Tooltip = Localization.Localizer.Current["app.name"];
+        tray.Show();
 
-    private void OnMaximizeRestore(object sender, RoutedEventArgs e) =>
-        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+        // Hidden rather than merely minimized: a taskbar button left behind next to the tray icon
+        // would give the window two places to come back from, and only one of them was asked for.
+        Hide();
+    }
+
+    private void RestoreFromTray()
+    {
+        _tray?.Hide();
+
+        Show();
+        WindowState = WindowState.Normal;
+        Activate();
+
+        // Activate() is not always enough on its own. The foreground window belongs to whatever the
+        // user was doing instead, and Windows only lets a process hand the foreground over — but the
+        // click that got us here was on our own tray window, so this is a call it honours.
+        _ = NativeMethods.SetForegroundWindow(new WindowInteropHelper(this).Handle);
+    }
+
+    private void OnTraySelected(object? sender, EventArgs e) => RestoreFromTray();
+
+    private void OnTrayContextMenu(object? sender, Point position)
+    {
+        if (TryFindResource("Tray.Menu") is not ContextMenu menu) return;
+
+        // A menu whose owner is in the background never learns that the user clicked somewhere else,
+        // and stays on screen until something finally takes the focus away from it.
+        _ = NativeMethods.SetForegroundWindow(Tray.Handle);
+
+        menu.Placement = PlacementMode.AbsolutePoint;
+        menu.HorizontalOffset = position.X;
+        menu.VerticalOffset = position.Y;
+        menu.IsOpen = true;
+    }
+
+    private void OnTrayShow(object sender, RoutedEventArgs e) => RestoreFromTray();
+
+    private void OnTrayExit(object sender, RoutedEventArgs e) => Close();
+
+    private void OnMinimize(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
     private void OnClose(object sender, RoutedEventArgs e) => Close();
 }

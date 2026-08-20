@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **A choice of folder picker.** Settings → Defaults → "Choose folders with" selects between the
+  Windows folder dialog and a folder browser built into the application. The Windows dialog is the
+  default; it is the one every other program opens, with the user's own pinned places in it. The
+  in-app browser lists the files inside each folder as well as its subfolders, which is what the
+  Windows dialog will not do.
+
+### Changed
+
+- **The window is a fixed size.** It cannot be dragged larger or smaller and cannot be maximized —
+  the maximize button is gone, and so is the resize border. It still minimizes, and still minimizes
+  to the notification area when that setting is on. A window that opens larger than the screen it
+  landed on is shrunk to fit, since with no resize border there would otherwise be no way back.
+- A window too small for its content is no longer possible, so the remembered window size and the
+  maximized flag are no longer written to `settings.json`. Existing files keep the three keys until
+  the next save, which drops them; nothing reads them in the meantime.
+
+### Fixed
+
+- The folder picker showed "no items match your search" when opened on a folder that contained files
+  but no subfolders. The Windows folder dialog lists folders only, which is what that message
+  reports — the app was seeing the files correctly the whole time. It is now explained where the
+  picker is chosen, and the in-app browser avoids it entirely.
+- A maximize command sent by something other than the user — a window manager, an accessibility
+  tool, UI Automation's `SetWindowVisualState` — is now refused rather than obeyed. Windows honours
+  an explicit `SC_MAXIMIZE` regardless of whether the window has a maximize box.
+
 ## [2.0.0] — 2026-08-20
 
 A rewrite. Version 1 was a fixed three-tab form; this is a rule pipeline with a shell around it.

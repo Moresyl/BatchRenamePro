@@ -6,7 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace BatchRenamePro.App.ViewModels;
 
-/// <summary>The pages the navigation rail can reach.</summary>
+/// <summary>The pages the navigation tabs can reach.</summary>
 public enum ShellPage
 {
     /// <summary>The rename workspace.</summary>
@@ -25,11 +25,11 @@ public enum ShellPage
     About
 }
 
-/// <summary>One entry in the navigation rail.</summary>
+/// <summary>One entry in the navigation tabs.</summary>
 /// <param name="Page">Which page it selects.</param>
 /// <param name="TitleCode">Localization key for the label.</param>
 /// <param name="IconKey">Resource key of the geometry drawn beside it.</param>
-/// <param name="AtBottom">Whether the entry is pinned to the bottom of the rail.</param>
+/// <param name="AtBottom">Whether the entry belongs to the trailing group, away from the main tabs.</param>
 public sealed record NavigationItem(ShellPage Page, string TitleCode, string IconKey, bool AtBottom = false);
 
 /// <summary>
@@ -46,9 +46,6 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private ShellPage _page = ShellPage.Rename;
 
-    [ObservableProperty]
-    private bool _isNavigationExpanded = true;
-
     /// <summary>Creates the shell.</summary>
     /// <param name="rename">The rename page.</param>
     /// <param name="history">The history page.</param>
@@ -59,7 +56,7 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     /// <param name="notifications">The toast host every page shares.</param>
     /// <param name="settings">Remembered window state.</param>
     /// <param name="theme">Applies the palette.</param>
-    /// <param name="localizer">Translates the title and the rail.</param>
+    /// <param name="localizer">Translates the title and the tabs.</param>
     public ShellViewModel(
         RenameViewModel rename,
         HistoryViewModel history,
@@ -87,8 +84,6 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
         _theme = theme;
         _localizer = localizer;
 
-        IsNavigationExpanded = settings.Current.NavigationExpanded;
-
         // A batch run from either page invalidates the other's view of the world.
         Rename.RunCompleted += OnHistoryChanged;
         History.Reverted += OnRenameChanged;
@@ -115,7 +110,7 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
     /// <summary>The toast host.</summary>
     public INotificationService Notifications { get; }
 
-    /// <summary>The navigation rail.</summary>
+    /// <summary>Every destination, in the order the tabs present them.</summary>
     public static IReadOnlyList<NavigationItem> Navigation { get; } =
     [
         new(ShellPage.Rename, "nav.rename", "Icon.Rename"),
@@ -125,11 +120,11 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
         new(ShellPage.About, "nav.about", "Icon.About", AtBottom: true)
     ];
 
-    /// <summary>The entries drawn at the top of the rail.</summary>
+    /// <summary>The tabs for the work itself, drawn beside the title.</summary>
     public static IReadOnlyList<NavigationItem> PrimaryNavigation { get; } =
         [.. Navigation.Where(item => !item.AtBottom)];
 
-    /// <summary>The entries pinned to the bottom of the rail.</summary>
+    /// <summary>The tabs that are about the application rather than the work, kept to the right.</summary>
     public static IReadOnlyList<NavigationItem> SecondaryNavigation { get; } =
         [.. Navigation.Where(item => item.AtBottom)];
 
@@ -154,15 +149,6 @@ public sealed partial class ShellViewModel : ObservableObject, IDisposable
         // The history is written by this process and by any other copy of it that is running, so it
         // is re-read on arrival rather than cached from startup.
         if (page is ShellPage.History) await History.LoadAsync().ConfigureAwait(true);
-    }
-
-    /// <summary>Collapses or expands the navigation rail.</summary>
-    [RelayCommand]
-    private void ToggleNavigation()
-    {
-        IsNavigationExpanded = !IsNavigationExpanded;
-        _settings.Current.NavigationExpanded = IsNavigationExpanded;
-        _settings.Save();
     }
 
     /// <summary>Flips between the light and dark palettes from the title bar.</summary>

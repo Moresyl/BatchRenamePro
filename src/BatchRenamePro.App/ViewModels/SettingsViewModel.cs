@@ -122,6 +122,20 @@ public sealed partial class SettingsViewModel : ObservableObject
         set => Write(value, CheckForUpdatesOnStartup, flag => _settings.Current.CheckForUpdatesOnStartup = flag);
     }
 
+    /// <summary>Whether minimizing puts the window in the notification area instead of the taskbar.</summary>
+    public bool MinimizeToTray
+    {
+        get => _settings.Current.MinimizeToTray;
+        set => Write(value, MinimizeToTray, flag => _settings.Current.MinimizeToTray = flag);
+    }
+
+    /// <summary>Which of the two folder choosers "add folder" opens.</summary>
+    public FolderPickerStyle FolderPicker
+    {
+        get => _settings.Current.FolderPicker;
+        set => Write(value, FolderPicker, style => _settings.Current.FolderPicker = style);
+    }
+
     /// <summary>Whether adding a folder pulls in its subfolders.</summary>
     public bool RecursiveByDefault
     {
@@ -148,13 +162,6 @@ public sealed partial class SettingsViewModel : ObservableObject
     {
         get => _settings.Current.HistoryLimit;
         set => Write(Math.Clamp(value, 5, 500), HistoryLimit, limit => _settings.Current.HistoryLimit = limit);
-    }
-
-    /// <summary>Whether the navigation rail starts expanded.</summary>
-    public bool NavigationExpanded
-    {
-        get => _settings.Current.NavigationExpanded;
-        set => Write(value, NavigationExpanded, flag => _settings.Current.NavigationExpanded = flag);
     }
 
     /// <summary>Where settings, presets and history are kept.</summary>

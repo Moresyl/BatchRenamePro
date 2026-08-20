@@ -22,14 +22,52 @@
 
     <!-- ==== Metrics ========================================================================= -->
 
-    <CornerRadius x:Key="Radius.Small">4</CornerRadius>
-    <CornerRadius x:Key="Radius.Medium">6</CornerRadius>
-    <CornerRadius x:Key="Radius.Large">8</CornerRadius>
-    <CornerRadius x:Key="Radius.XLarge">12</CornerRadius>
-    <CornerRadius x:Key="Radius.Pill">999</CornerRadius>
+    <!--
+        Every size in the application resolves to one of these. They are gathered here rather than
+        written into the styles because density is a single decision, not fifty: the tool is meant to
+        sit next to a file manager while you work, so it is built at the density of a Windows dialog
+        — a 28px control, a 22px row, a 12px face — not at the airy scale of a full-screen app. That
+        only holds if there is one place to change it, and nothing hard-codes a number behind its
+        back.
+    -->
 
-    <sys:Double x:Key="Size.Row">34</sys:Double>
-    <sys:Double x:Key="Size.Icon">16</sys:Double>
+    <CornerRadius x:Key="Radius.Small">3</CornerRadius>
+    <CornerRadius x:Key="Radius.Medium">4</CornerRadius>
+    <CornerRadius x:Key="Radius.Large">6</CornerRadius>
+    <CornerRadius x:Key="Radius.XLarge">8</CornerRadius>
+
+    <!--
+        There is deliberately no Radius.Pill. WPF does not clamp a CornerRadius to half the side it
+        sits on the way CSS does — give a 6px-wide scroll thumb a radius of 999 and the four arcs
+        overrun each other, and what draws is a lens, not a capsule. That is where the bowed scroll
+        bar and the bowed switch came from. A capsule is therefore written as half its own height at
+        the one place that knows the height, and each of those sites says so.
+    -->
+
+    <!-- Heights. Control is what a button, text box and combo box all share, so they line up in a
+         row without anyone setting a height by hand. -->
+    <sys:Double x:Key="Size.Control">28</sys:Double>
+    <sys:Double x:Key="Size.Control.Small">22</sys:Double>
+    <sys:Double x:Key="Size.Row">22</sys:Double>
+    <sys:Double x:Key="Size.Caption">32</sys:Double>
+    <sys:Double x:Key="Size.Tab">30</sys:Double>
+
+    <sys:Double x:Key="Size.Icon">14</sys:Double>
+    <sys:Double x:Key="Size.Icon.Small">11</sys:Double>
+    <sys:Double x:Key="Size.Check">16</sys:Double>
+
+    <!-- Type ramp. 12 is the Windows shell's own body size (9pt); everything else is placed
+         relative to it, and only the page title is allowed to be large. -->
+    <sys:Double x:Key="Font.Size.Caption">11</sys:Double>
+    <sys:Double x:Key="Font.Size.Body">12</sys:Double>
+    <sys:Double x:Key="Font.Size.Subtitle">14</sys:Double>
+    <sys:Double x:Key="Font.Size.Title">19</sys:Double>
+
+    <!-- Spacing. Panel is the inset of a panel's content from its edge; Control is the inset of a
+         control's text from its border. -->
+    <Thickness x:Key="Pad.Control">8,0</Thickness>
+    <Thickness x:Key="Pad.Panel">10</Thickness>
+    <Thickness x:Key="Pad.Panel.Tight">8</Thickness>
 
     <!-- ==== Typography ======================================================================= -->
 
@@ -44,7 +82,7 @@
 
     <Style x:Key="Text.Body" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Body}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
         <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
         <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
@@ -59,33 +97,33 @@
     </Style>
 
     <Style x:Key="Text.Caption" TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
-        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Caption}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Tertiary}" />
     </Style>
 
-    <!-- Small, spaced and upper-case: the label above a group of settings. -->
+    <!-- The label above a group of settings: small and semi-bold rather than large. -->
     <Style x:Key="Text.Section" TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
-        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Caption}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Tertiary}" />
-        <Setter Property="Margin" Value="0,0,0,8" />
+        <Setter Property="Margin" Value="0,0,0,5" />
     </Style>
 
     <Style x:Key="Text.Subtitle" TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family.Display}" />
-        <Setter Property="FontSize" Value="17" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Subtitle}" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
     <Style x:Key="Text.Title" TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family.Display}" />
-        <Setter Property="FontSize" Value="26" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Title}" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
     <Style x:Key="Text.Mono" TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family.Mono}" />
-        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Body}" />
     </Style>
 
     <!-- ==== Focus =========================================================================== -->
@@ -98,17 +136,17 @@
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Grid Margin="-3">
+                    <Grid Margin="-2">
                         <Border
                             BorderBrush="{DynamicResource Brush.Stroke.Focus}"
                             BorderThickness="2"
-                            CornerRadius="7"
+                            CornerRadius="5"
                             SnapsToDevicePixels="True" />
                         <Border
                             Margin="2"
                             BorderBrush="{DynamicResource Brush.Stroke.FocusInner}"
                             BorderThickness="1"
-                            CornerRadius="5"
+                            CornerRadius="3"
                             SnapsToDevicePixels="True" />
                     </Grid>
                 </ControlTemplate>
@@ -157,7 +195,7 @@
                 Orientation="Horizontal">
                 <Path
                     x:Name="Glyph"
-                    Margin="0,0,8,0"
+                    Margin="0,0,6,0"
                     Data="{TemplateBinding Tag}"
                     Fill="{TemplateBinding Foreground}"
                     Style="{StaticResource Icon}" />
@@ -201,14 +239,14 @@
     -->
     <Style TargetType="Button">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Body}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
         <Setter Property="Background" Value="{DynamicResource Brush.Bg.Control}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.Default}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="14,0" />
-        <Setter Property="MinHeight" Value="{StaticResource Size.Row}" />
-        <Setter Property="MinWidth" Value="72" />
+        <Setter Property="Padding" Value="{StaticResource Pad.Control}" />
+        <Setter Property="MinHeight" Value="{StaticResource Size.Control}" />
+        <Setter Property="MinWidth" Value="64" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Visual}" />
@@ -225,10 +263,10 @@
     <!-- The one button on a page that does the thing the page exists for. -->
     <Style x:Key="Button.Accent" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.OnAccent}" />
-        <Setter Property="Background" Value="{DynamicResource Brush.Accent.Gradient}" />
+        <Setter Property="Background" Value="{DynamicResource Brush.Accent.Default}" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Padding" Value="18,0" />
+        <Setter Property="Padding" Value="12,0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ButtonBase">
@@ -256,7 +294,7 @@
                             <Setter TargetName="Glyph" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Brush.Accent.GradientHover}" />
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Brush.Accent.Hover}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Root" Property="Opacity" Value="0.78" />
@@ -277,19 +315,19 @@
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
         <Setter Property="MinWidth" Value="0" />
-        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="Padding" Value="{StaticResource Pad.Control}" />
     </Style>
 
     <Style x:Key="Button.Icon" TargetType="Button" BasedOn="{StaticResource Button.Subtle}">
-        <Setter Property="Width" Value="32" />
-        <Setter Property="Height" Value="32" />
+        <Setter Property="Width" Value="{StaticResource Size.Control}" />
+        <Setter Property="Height" Value="{StaticResource Size.Control}" />
         <Setter Property="MinHeight" Value="0" />
         <Setter Property="Padding" Value="0" />
     </Style>
 
     <Style x:Key="Button.Icon.Small" TargetType="Button" BasedOn="{StaticResource Button.Icon}">
-        <Setter Property="Width" Value="26" />
-        <Setter Property="Height" Value="26" />
+        <Setter Property="Width" Value="{StaticResource Size.Control.Small}" />
+        <Setter Property="Height" Value="{StaticResource Size.Control.Small}" />
     </Style>
 
     <!--
@@ -331,8 +369,10 @@
     <!-- ==== Window buttons ================================================================== -->
 
     <Style x:Key="Button.Window" TargetType="Button">
+        <!-- 46x32 is what every Windows 11 caption strip uses, so the buttons land where the muscle
+             memory expects them and the hover plates line up with the ones next door. -->
         <Setter Property="Width" Value="46" />
-        <Setter Property="Height" Value="34" />
+        <Setter Property="Height" Value="{StaticResource Size.Caption}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
@@ -409,64 +449,77 @@
                 <ControlTemplate TargetType="ToggleButton">
                     <Border
                         x:Name="Track"
-                        Width="40"
-                        Height="20"
+                        Width="32"
+                        Height="16"
                         Background="{DynamicResource Brush.Bg.Control}"
                         BorderBrush="{DynamicResource Brush.Stroke.Strong}"
                         BorderThickness="1"
-                        CornerRadius="{StaticResource Radius.Pill}">
+                        CornerRadius="8">
+                        <!--
+                            The thumb travels by margin, not by a render transform, and the checked
+                            trigger below sets that margin as well as animating it. A transform
+                            would be cheaper, but its resting position could only be established by
+                            the storyboard — and EnterActions fire on a transition, never on a
+                            state that was already true when the template was applied. A switch
+                            bound to a setting that loads enabled would come up blue with the thumb
+                            still on the left. Margin is one property, so the Setter answers for the
+                            state and the animation only for the journey between states.
+                        -->
                         <Ellipse
                             x:Name="Thumb"
-                            Width="12"
-                            Height="12"
+                            Width="9"
+                            Height="9"
                             HorizontalAlignment="Left"
                             Margin="3,0,0,0"
-                            Fill="{DynamicResource Brush.Text.Secondary}"
-                            RenderTransformOrigin="0.5,0.5">
-                            <Ellipse.RenderTransform>
-                                <TranslateTransform X="0" />
-                            </Ellipse.RenderTransform>
-                        </Ellipse>
+                            Fill="{DynamicResource Brush.Text.Secondary}" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="Track" Property="Background" Value="{DynamicResource Brush.Accent.Default}" />
                             <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource Brush.Accent.Default}" />
                             <Setter TargetName="Thumb" Property="Fill" Value="{DynamicResource Brush.Text.OnAccent}" />
+
+                            <!--
+                                Track 32 wide less two 1px borders leaves 30; a 9px thumb inset 3
+                                from the right edge sits at a left margin of 18.
+                            -->
+                            <Setter TargetName="Thumb" Property="Margin" Value="18,0,0,0" />
                             <Trigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation
+                                        <ThicknessAnimation
                                             Storyboard.TargetName="Thumb"
-                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
-                                            To="20"
+                                            Storyboard.TargetProperty="Margin"
+                                            From="3,0,0,0"
+                                            To="18,0,0,0"
                                             Duration="0:0:0.16">
-                                            <DoubleAnimation.EasingFunction>
+                                            <ThicknessAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
+                                            </ThicknessAnimation.EasingFunction>
+                                        </ThicknessAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
                             <Trigger.ExitActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <DoubleAnimation
+                                        <ThicknessAnimation
                                             Storyboard.TargetName="Thumb"
-                                            Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
-                                            To="0"
+                                            Storyboard.TargetProperty="Margin"
+                                            From="18,0,0,0"
+                                            To="3,0,0,0"
                                             Duration="0:0:0.16">
-                                            <DoubleAnimation.EasingFunction>
+                                            <ThicknessAnimation.EasingFunction>
                                                 <CubicEase EasingMode="EaseOut" />
-                                            </DoubleAnimation.EasingFunction>
-                                        </DoubleAnimation>
+                                            </ThicknessAnimation.EasingFunction>
+                                        </ThicknessAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Thumb" Property="Width" Value="14" />
-                            <Setter TargetName="Thumb" Property="Height" Value="14" />
+                            <Setter TargetName="Thumb" Property="Width" Value="11" />
+                            <Setter TargetName="Thumb" Property="Height" Value="11" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Track" Property="Opacity" Value="0.4" />
@@ -481,7 +534,7 @@
 
     <Style TargetType="CheckBox">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Body}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Cursor" Value="Hand" />
@@ -492,8 +545,8 @@
                     <StackPanel Background="Transparent" Orientation="Horizontal">
                         <Border
                             x:Name="Box"
-                            Width="20"
-                            Height="20"
+                            Width="{StaticResource Size.Check}"
+                            Height="{StaticResource Size.Check}"
                             VerticalAlignment="Center"
                             Background="{DynamicResource Brush.Bg.Control}"
                             BorderBrush="{DynamicResource Brush.Stroke.Strong}"
@@ -502,8 +555,8 @@
                             SnapsToDevicePixels="True">
                             <Path
                                 x:Name="Tick"
-                                Width="12"
-                                Height="12"
+                                Width="9"
+                                Height="9"
                                 Data="{StaticResource Icon.Check}"
                                 Fill="{DynamicResource Brush.Text.OnAccent}"
                                 Stretch="Uniform"
@@ -511,7 +564,7 @@
                         </Border>
                         <ContentPresenter
                             x:Name="Label"
-                            Margin="10,0,0,0"
+                            Margin="7,0,0,0"
                             VerticalAlignment="Center"
                             RecognizesAccessKey="True" />
                     </StackPanel>
@@ -540,9 +593,9 @@
 
     <Style x:Key="Segment" TargetType="RadioButton">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family}" />
-        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Body}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
-        <Setter Property="Padding" Value="12,5" />
+        <Setter Property="Padding" Value="10,4" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Visual}" />
         <Setter Property="Template">
@@ -586,7 +639,7 @@
 
     <Style TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Body}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
         <Setter Property="Background" Value="{DynamicResource Brush.Bg.Control}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.Default}" />
@@ -594,8 +647,8 @@
         <Setter Property="CaretBrush" Value="{DynamicResource Brush.Text.Primary}" />
         <Setter Property="SelectionBrush" Value="{DynamicResource Brush.Accent.Default}" />
         <Setter Property="SelectionOpacity" Value="0.4" />
-        <Setter Property="Padding" Value="10,0" />
-        <Setter Property="MinHeight" Value="{StaticResource Size.Row}" />
+        <Setter Property="Padding" Value="{StaticResource Pad.Control}" />
+        <Setter Property="MinHeight" Value="{StaticResource Size.Control}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="ContextMenu" Value="{x:Null}" />
         <Setter Property="Template">
@@ -628,7 +681,7 @@
                             VerticalAlignment="Bottom"
                             Margin="1,0,1,0"
                             Background="{DynamicResource Brush.Accent.Default}"
-                            CornerRadius="0,0,5,5"
+                            CornerRadius="0,0,3,3"
                             Visibility="Collapsed" />
                         <TextBlock
                             x:Name="Placeholder"
@@ -663,7 +716,7 @@
 
     <Style x:Key="TextBox.Mono" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family.Mono}" />
-        <Setter Property="FontSize" Value="12.5" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Body}" />
     </Style>
 
     <!-- ==== Combo box ======================================================================= -->
@@ -683,9 +736,9 @@
 
     <Style TargetType="ComboBoxItem">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Body}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
-        <Setter Property="Padding" Value="10,7" />
+        <Setter Property="Padding" Value="8,4" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
@@ -701,11 +754,11 @@
                             <Border
                                 x:Name="Marker"
                                 Width="3"
-                                Height="16"
-                                Margin="-6,0,0,0"
+                                Height="12"
+                                Margin="-5,0,0,0"
                                 HorizontalAlignment="Left"
                                 Background="{DynamicResource Brush.Accent.Default}"
-                                CornerRadius="{StaticResource Radius.Pill}"
+                                CornerRadius="1.5"
                                 Visibility="Collapsed" />
                             <ContentPresenter VerticalAlignment="Center" />
                         </Grid>
@@ -726,13 +779,13 @@
 
     <Style TargetType="ComboBox">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Body}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
         <Setter Property="Background" Value="{DynamicResource Brush.Bg.Control}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.Default}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="10,0" />
-        <Setter Property="MinHeight" Value="{StaticResource Size.Row}" />
+        <Setter Property="Padding" Value="{StaticResource Pad.Control}" />
+        <Setter Property="MinHeight" Value="{StaticResource Size.Control}" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Visual}" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
@@ -765,9 +818,9 @@
                                 <Path
                                     x:Name="Chevron"
                                     Grid.Column="1"
-                                    Width="10"
-                                    Height="10"
-                                    Margin="0,0,10,0"
+                                    Width="9"
+                                    Height="9"
+                                    Margin="0,0,8,0"
                                     Data="{StaticResource Icon.ChevronDown}"
                                     Fill="{DynamicResource Brush.Text.Secondary}"
                                     IsHitTestVisible="False"
@@ -820,6 +873,41 @@
         </Setter>
     </Style>
 
+    <!-- ==== Rule editor fields ============================================================== -->
+
+    <!--
+        The scaffolding every rule editor is built from: a labelled field, a check, a number box,
+        an enum picker. They live here rather than beside the editors that use them because each
+        one has to derive from the themed base style for its type, and BasedOn only accepts a
+        StaticResource — which, from a sibling dictionary, cannot see these implicit styles.
+        Declared there, a keyed ComboBox style would silently replace the whole theme with the
+        stock WPF one, and the rule cards would be wearing a different decade's controls.
+    -->
+
+    <Style x:Key="Field" TargetType="StackPanel">
+        <Setter Property="Margin" Value="0,0,0,8" />
+    </Style>
+
+    <Style x:Key="Field.Label" TargetType="TextBlock" BasedOn="{StaticResource Text.Caption}">
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
+        <Setter Property="Margin" Value="2,0,0,3" />
+    </Style>
+
+    <Style x:Key="Field.Check" TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+        <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+
+    <Style x:Key="Field.Number" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="Width" Value="64" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+
+    <!-- Every enum picker in the rule editors: value in, localized label out. -->
+    <Style x:Key="Field.Enum" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="DisplayMemberPath" Value="Text" />
+        <Setter Property="SelectedValuePath" Value="Value" />
+    </Style>
+
     <!-- ==== Scroll bars ===================================================================== -->
 
     <Style x:Key="ScrollBar.Thumb" TargetType="Thumb">
@@ -827,10 +915,12 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
+                    <!-- The bar is 10 wide and the margin takes 2 off each side, so the thumb is 6:
+                         a radius of 3 is the capsule, and anything larger bows it. -->
                     <Border
-                        Margin="3"
+                        Margin="2"
                         Background="{DynamicResource Brush.Text.Tertiary}"
-                        CornerRadius="{StaticResource Radius.Pill}" />
+                        CornerRadius="3" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -854,8 +944,8 @@
 
     <Style TargetType="ScrollBar">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Width" Value="12" />
-        <Setter Property="MinWidth" Value="12" />
+        <Setter Property="Width" Value="10" />
+        <Setter Property="MinWidth" Value="10" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ScrollBar">
@@ -884,8 +974,8 @@
             <Trigger Property="Orientation" Value="Horizontal">
                 <Setter Property="Width" Value="Auto" />
                 <Setter Property="MinWidth" Value="0" />
-                <Setter Property="Height" Value="12" />
-                <Setter Property="MinHeight" Value="12" />
+                <Setter Property="Height" Value="10" />
+                <Setter Property="MinHeight" Value="10" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ScrollBar">
@@ -943,9 +1033,9 @@
 
     <Style TargetType="ListBoxItem">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Body}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
-        <Setter Property="Padding" Value="10,7" />
+        <Setter Property="Padding" Value="8,5" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="Template">
             <Setter.Value>
@@ -985,7 +1075,7 @@
         x:Key="Row"
         BasedOn="{StaticResource {x:Type ListBoxItem}}"
         TargetType="ListBoxItem">
-        <Setter Property="Padding" Value="10,3" />
+        <Setter Property="Padding" Value="6,0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
@@ -1013,40 +1103,45 @@
         </Setter>
     </Style>
 
-    <!-- ==== Navigation rail ================================================================= -->
+    <!-- ==== Navigation tabs ================================================================= -->
 
+    <!--
+        A horizontal tab rather than a vertical rail. A rail costs 56px of width before it has shown
+        anything and pushes the whole layout rightwards; five destinations do not need that. This is
+        the Windows 11 pivot: text on a transparent plate, a short accent bar under the selected one,
+        and nothing drawn around it.
+    -->
     <Style x:Key="Nav.Item" TargetType="ListBoxItem">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Body}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
-        <Setter Property="Height" Value="40" />
+        <Setter Property="Height" Value="{StaticResource Size.Tab}" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource Focus.Visual}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
-                    <Grid Margin="4,2">
+                    <Grid Margin="1,0">
                         <Border
                             x:Name="Root"
                             Background="Transparent"
                             CornerRadius="{StaticResource Radius.Medium}"
                             SnapsToDevicePixels="True" />
-                        <!-- The vertical pill that marks the selected page, as in the Windows 11 shell. -->
-                        <Border
-                            x:Name="Marker"
-                            Width="3"
-                            Height="18"
-                            Margin="0,0,0,0"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Background="{DynamicResource Brush.Accent.Gradient}"
-                            CornerRadius="{StaticResource Radius.Pill}"
-                            Opacity="0" />
                         <ContentPresenter
-                            Margin="12,0,8,0"
+                            Margin="9,0"
                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalAlignment="Center" />
+                        <!-- The bar under the selected tab. Inset so it spans the label, not the
+                             whole hit target, which is what makes a row of tabs read as a row. -->
+                        <Border
+                            x:Name="Marker"
+                            Height="2"
+                            Margin="9,0"
+                            VerticalAlignment="Bottom"
+                            Background="{DynamicResource Brush.Accent.Default}"
+                            CornerRadius="1"
+                            Opacity="0" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -1054,12 +1149,37 @@
                             <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource Brush.Bg.Selected}" />
                             <Setter TargetName="Marker" Property="Opacity" Value="1" />
                             <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
                             <Setter Property="FontWeight" Value="SemiBold" />
                         </Trigger>
                     </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--
+        The strip the tabs sit in. The stock list template wraps its items in a ScrollViewer, which
+        is the wrong container for five tabs in a title bar: it would clip them before the window is
+        anywhere near its minimum width. This lays them out and nothing else.
+    -->
+    <Style x:Key="Nav.Strip" TargetType="ListBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource Nav.Item}" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBox">
+                    <ItemsPresenter />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -1090,7 +1210,7 @@
     <Style x:Key="Divider" TargetType="Border">
         <Setter Property="Height" Value="1" />
         <Setter Property="Background" Value="{DynamicResource Brush.Stroke.Divider}" />
-        <Setter Property="Margin" Value="0,8" />
+        <Setter Property="Margin" Value="0,6" />
     </Style>
 
     <!-- ==== Status chips ==================================================================== -->
@@ -1099,8 +1219,9 @@
         <Setter Property="Background" Value="{DynamicResource Brush.Bg.Subtle}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Brush.Stroke.Subtle}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="{StaticResource Radius.Pill}" />
-        <Setter Property="Padding" Value="8,2" />
+        <!-- Padding 1 top and bottom around an 11px caption line, plus the border, comes to 19. -->
+        <Setter Property="CornerRadius" Value="9.5" />
+        <Setter Property="Padding" Value="7,1" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
@@ -1128,16 +1249,17 @@
     <!-- ==== Progress ======================================================================== -->
 
     <Style TargetType="ProgressBar">
-        <Setter Property="Height" Value="4" />
+        <Setter Property="Height" Value="3" />
         <Setter Property="Background" Value="{DynamicResource Brush.Bg.Subtle}" />
-        <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Gradient}" />
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Default}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ProgressBar">
+                    <!-- The bar is 3 tall, so 1.5 rounds the ends and nothing more. -->
                     <Border
                         x:Name="Track"
                         Background="{TemplateBinding Background}"
-                        CornerRadius="{StaticResource Radius.Pill}"
+                        CornerRadius="1.5"
                         SnapsToDevicePixels="True">
                         <Grid ClipToBounds="True">
                             <Border
@@ -1147,7 +1269,7 @@
                                 x:Name="PART_Indicator"
                                 HorizontalAlignment="Left"
                                 Background="{TemplateBinding Foreground}"
-                                CornerRadius="{StaticResource Radius.Pill}" />
+                                CornerRadius="1.5" />
                         </Grid>
                     </Border>
                 </ControlTemplate>
@@ -1159,17 +1281,17 @@
 
     <Style TargetType="ToolTip">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family}" />
-        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Caption}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
         <Setter Property="HasDropShadow" Value="False" />
         <Setter Property="Placement" Value="Bottom" />
-        <Setter Property="VerticalOffset" Value="6" />
+        <Setter Property="VerticalOffset" Value="4" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToolTip">
                     <Border
-                        Margin="8"
-                        Padding="10,6"
+                        Margin="6"
+                        Padding="8,4"
                         Background="{DynamicResource Brush.Bg.Flyout}"
                         BorderBrush="{DynamicResource Brush.Stroke.Default}"
                         BorderThickness="1"
@@ -1207,9 +1329,9 @@
 
     <Style TargetType="MenuItem">
         <Setter Property="FontFamily" Value="{StaticResource Font.Family}" />
-        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontSize" Value="{StaticResource Font.Size.Body}" />
         <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}" />
-        <Setter Property="Padding" Value="10,7" />
+        <Setter Property="Padding" Value="8,5" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="MenuItem">
@@ -1222,7 +1344,7 @@
                         <StackPanel Orientation="Horizontal">
                             <Path
                                 x:Name="Glyph"
-                                Margin="0,0,10,0"
+                                Margin="0,0,8,0"
                                 Data="{TemplateBinding Icon}"
                                 Fill="{DynamicResource Brush.Text.Secondary}"
                                 Style="{StaticResource Icon}" />

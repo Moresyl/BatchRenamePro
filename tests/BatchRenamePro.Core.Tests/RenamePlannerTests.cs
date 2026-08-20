@@ -123,7 +123,8 @@ public sealed class RenamePlannerTests
         [
             new PatternRule { Pattern = "report" },
             new CaseRule { Mode = CaseMode.Upper },
-            new InsertRule { Text = "_v2", Position = InsertPosition.Suffix }
+            // Keeps what the two rules before it produced — which is the thing being asserted.
+            new InsertRule { ReplacesName = false, Text = "_v2", Position = InsertPosition.Suffix }
         ]);
 
         Assert.AreEqual("REPORT_v2.txt", plan.Items[0].ProposedName);
@@ -281,6 +282,8 @@ public sealed class RenamePlannerTests
 
         var rule = new NumberRule
         {
+            // Keeping the names is what makes this assertable: x must be the one that got 01.
+            ReplacesName = false,
             Position = InsertPosition.Prefix,
             Separator = "-",
             Sequence = new SequenceSettings { Start = 1, Padding = 2 }

@@ -12,7 +12,7 @@
 
         <!-- One setting: a label and its explanation on the left, the control on the right. -->
         <Style x:Key="Setting" TargetType="Grid">
-            <Setter Property="Margin" Value="0,0,0,4" />
+            <Setter Property="Margin" Value="0,0,0,2" />
         </Style>
 
         <Style x:Key="Setting.Label" TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
@@ -20,127 +20,36 @@
         </Style>
 
         <Style x:Key="Setting.Hint" TargetType="TextBlock" BasedOn="{StaticResource Text.Caption}">
-            <Setter Property="Margin" Value="0,3,0,0" />
+            <Setter Property="Margin" Value="0,2,0,0" />
             <Setter Property="TextWrapping" Value="Wrap" />
         </Style>
     </UserControl.Resources>
 
-    <Border Margin="0,0,16,16" Style="{StaticResource Panel}">
+    <Border Margin="10,2,10,10" Style="{StaticResource Panel}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <StackPanel Margin="20,18,20,12">
+            <StackPanel Margin="12,10,12,8">
                 <TextBlock Style="{StaticResource Text.Title}" Text="{loc:T settings.title}" />
                 <TextBlock
-                    Margin="0,4,0,0"
+                    Margin="0,2,0,0"
                     Style="{StaticResource Text.Secondary}"
                     Text="{loc:T settings.subtitle}" />
             </StackPanel>
 
             <ScrollViewer
                 Grid.Row="1"
-                Padding="20,0,14,20"
+                Padding="12,0,8,12"
                 VerticalScrollBarVisibility="Auto">
-                <StackPanel MaxWidth="720" HorizontalAlignment="Left">
+                <StackPanel MaxWidth="640" HorizontalAlignment="Left">
 
                     <!-- ==== Appearance ==== -->
 
                     <TextBlock Style="{StaticResource Text.Section}" Text="{loc:T settings.section.appearance}" />
-                    <Border Padding="18,14" Style="{StaticResource Card}">
-                        <StackPanel>
-                            <Grid Style="{StaticResource Setting}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.theme}" />
-                                    <TextBlock Style="{StaticResource Setting.Hint}" Text="{loc:T settings.theme.hint}" />
-                                </StackPanel>
-                                <ComboBox
-                                    Grid.Column="1"
-                                    Width="180"
-                                    AutomationProperties.Name="{loc:T settings.theme}"
-                                    DisplayMemberPath="Text"
-                                    ItemsSource="{loc:EnumSource {x:Type services:AppTheme}}"
-                                    SelectedValue="{Binding Theme}"
-                                    SelectedValuePath="Value" />
-                            </Grid>
-
-                            <Border Style="{StaticResource Divider}" />
-
-                            <Grid Style="{StaticResource Setting}" IsEnabled="{x:Static vm:SettingsViewModel.BackdropAvailable}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.backdrop}" />
-                                    <TextBlock Style="{StaticResource Setting.Hint}" Text="{loc:T settings.backdrop.hint}" />
-                                    <TextBlock
-                                        Foreground="{DynamicResource Brush.Warning}"
-                                        Style="{StaticResource Setting.Hint}"
-                                        Text="{loc:T settings.backdrop.unavailable}"
-                                        Visibility="{Binding Source={x:Static vm:SettingsViewModel.BackdropAvailable}, Converter={StaticResource BoolToVisibilityInverse}}" />
-                                </StackPanel>
-                                <ComboBox
-                                    Grid.Column="1"
-                                    Width="180"
-                                    AutomationProperties.Name="{loc:T settings.backdrop}"
-                                    DisplayMemberPath="Text"
-                                    ItemsSource="{loc:EnumSource {x:Type services:WindowBackdrop}}"
-                                    SelectedValue="{Binding Backdrop}"
-                                    SelectedValuePath="Value" />
-                            </Grid>
-
-                            <Border Style="{StaticResource Divider}" />
-
-                            <Grid Style="{StaticResource Setting}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.language}" />
-                                    <TextBlock Style="{StaticResource Setting.Hint}" Text="{loc:T settings.language.hint}" />
-                                </StackPanel>
-                                <ComboBox
-                                    Grid.Column="1"
-                                    Width="180"
-                                    AutomationProperties.Name="{loc:T settings.language}"
-                                    DisplayMemberPath="NativeName"
-                                    ItemsSource="{Binding Languages}"
-                                    SelectedValue="{Binding Culture}"
-                                    SelectedValuePath="Culture" />
-                            </Grid>
-
-                            <Border Style="{StaticResource Divider}" />
-
-                            <Grid Style="{StaticResource Setting}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.navigationExpanded}" />
-                                <ToggleButton
-                                    Grid.Column="1"
-                                    AutomationProperties.Name="{loc:T settings.navigationExpanded}"
-                                    IsChecked="{Binding NavigationExpanded}"
-                                    Style="{StaticResource Switch}" />
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <!-- ==== Renaming defaults ==== -->
-
-                    <TextBlock
-                        Margin="0,22,0,8"
-                        Style="{StaticResource Text.Section}"
-                        Text="{loc:T settings.section.defaults}" />
-                    <Border Padding="18,14" Style="{StaticResource Card}">
+                    <Border Padding="12,9" Style="{StaticResource Card}">
                         <StackPanel>
                             <Grid Style="{StaticResource Setting}">
                                 <Grid.ColumnDefinitions>
@@ -166,6 +75,104 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.minimizeToTray}" />
+                                    <TextBlock Style="{StaticResource Setting.Hint}" Text="{loc:T settings.minimizeToTray.hint}" />
+                                </StackPanel>
+                                <ToggleButton
+                                    Grid.Column="1"
+                                    AutomationProperties.Name="{loc:T settings.minimizeToTray}"
+                                    IsChecked="{Binding MinimizeToTray}"
+                                    Style="{StaticResource Switch}" />
+                            </Grid>
+
+                            <Border Style="{StaticResource Divider}" />
+
+                            <Grid Style="{StaticResource Setting}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.theme}" />
+                                    <TextBlock Style="{StaticResource Setting.Hint}" Text="{loc:T settings.theme.hint}" />
+                                </StackPanel>
+                                <ComboBox
+                                    Grid.Column="1"
+                                    Width="156"
+                                    VerticalAlignment="Center"
+                                    AutomationProperties.Name="{loc:T settings.theme}"
+                                    DisplayMemberPath="Text"
+                                    ItemsSource="{loc:EnumSource {x:Type services:AppTheme}}"
+                                    SelectedValue="{Binding Theme}"
+                                    SelectedValuePath="Value" />
+                            </Grid>
+
+                            <Border Style="{StaticResource Divider}" />
+
+                            <Grid Style="{StaticResource Setting}" IsEnabled="{x:Static vm:SettingsViewModel.BackdropAvailable}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.backdrop}" />
+                                    <TextBlock Style="{StaticResource Setting.Hint}" Text="{loc:T settings.backdrop.hint}" />
+                                    <TextBlock
+                                        Foreground="{DynamicResource Brush.Warning}"
+                                        Style="{StaticResource Setting.Hint}"
+                                        Text="{loc:T settings.backdrop.unavailable}"
+                                        Visibility="{Binding Source={x:Static vm:SettingsViewModel.BackdropAvailable}, Converter={StaticResource BoolToVisibilityInverse}}" />
+                                </StackPanel>
+                                <ComboBox
+                                    Grid.Column="1"
+                                    Width="156"
+                                    VerticalAlignment="Center"
+                                    AutomationProperties.Name="{loc:T settings.backdrop}"
+                                    DisplayMemberPath="Text"
+                                    ItemsSource="{loc:EnumSource {x:Type services:WindowBackdrop}}"
+                                    SelectedValue="{Binding Backdrop}"
+                                    SelectedValuePath="Value" />
+                            </Grid>
+
+                            <Border Style="{StaticResource Divider}" />
+
+                            <Grid Style="{StaticResource Setting}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.language}" />
+                                    <TextBlock Style="{StaticResource Setting.Hint}" Text="{loc:T settings.language.hint}" />
+                                </StackPanel>
+                                <ComboBox
+                                    Grid.Column="1"
+                                    Width="156"
+                                    VerticalAlignment="Center"
+                                    AutomationProperties.Name="{loc:T settings.language}"
+                                    DisplayMemberPath="NativeName"
+                                    ItemsSource="{Binding Languages}"
+                                    SelectedValue="{Binding Culture}"
+                                    SelectedValuePath="Culture" />
+                            </Grid>
+
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ==== Renaming defaults ==== -->
+
+                    <TextBlock
+                        Margin="0,14,0,5"
+                        Style="{StaticResource Text.Section}"
+                        Text="{loc:T settings.section.defaults}" />
+                    <Border Padding="12,9" Style="{StaticResource Card}">
+                        <StackPanel>
+                            <Grid Style="{StaticResource Setting}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
                                     <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.confirmBeforeRun}" />
                                     <TextBlock Style="{StaticResource Setting.Hint}" Text="{loc:T settings.confirmBeforeRun.hint}" />
                                 </StackPanel>
@@ -174,6 +181,33 @@
                                     AutomationProperties.Name="{loc:T settings.confirmBeforeRun}"
                                     IsChecked="{Binding ConfirmBeforeRun}"
                                     Style="{StaticResource Switch}" />
+                            </Grid>
+
+                            <Border Style="{StaticResource Divider}" />
+
+                            <!--
+                                Above the two scan settings rather than below them, because it is the
+                                first of the three that happens: you choose the folder, then it is
+                                scanned, then what the scan found is named.
+                            -->
+                            <Grid Style="{StaticResource Setting}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.folderPicker}" />
+                                    <TextBlock Style="{StaticResource Setting.Hint}" Text="{loc:T settings.folderPicker.hint}" />
+                                </StackPanel>
+                                <ComboBox
+                                    Grid.Column="1"
+                                    Width="156"
+                                    VerticalAlignment="Center"
+                                    AutomationProperties.Name="{loc:T settings.folderPicker}"
+                                    DisplayMemberPath="Text"
+                                    ItemsSource="{loc:EnumSource {x:Type services:FolderPickerStyle}}"
+                                    SelectedValue="{Binding FolderPicker}"
+                                    SelectedValuePath="Value" />
                             </Grid>
 
                             <Border Style="{StaticResource Divider}" />
@@ -204,7 +238,8 @@
                                 <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.scanTarget}" />
                                 <ComboBox
                                     Grid.Column="1"
-                                    Width="180"
+                                    Width="156"
+                                    VerticalAlignment="Center"
                                     AutomationProperties.Name="{loc:T settings.scanTarget}"
                                     DisplayMemberPath="Text"
                                     ItemsSource="{loc:EnumSource {x:Type scanning:ScanTarget}}"
@@ -225,7 +260,8 @@
                                 </StackPanel>
                                 <ComboBox
                                     Grid.Column="1"
-                                    Width="180"
+                                    Width="156"
+                                    VerticalAlignment="Center"
                                     AutomationProperties.Name="{loc:T settings.conflictPolicy}"
                                     DisplayMemberPath="Text"
                                     ItemsSource="{loc:EnumSource {x:Type planning:ConflictPolicy}}"
@@ -238,10 +274,10 @@
                     <!-- ==== Data ==== -->
 
                     <TextBlock
-                        Margin="0,22,0,8"
+                        Margin="0,14,0,5"
                         Style="{StaticResource Text.Section}"
                         Text="{loc:T settings.section.data}" />
-                    <Border Padding="18,14" Style="{StaticResource Card}">
+                    <Border Padding="12,9" Style="{StaticResource Card}">
                         <StackPanel>
                             <Grid Style="{StaticResource Setting}">
                                 <Grid.ColumnDefinitions>
@@ -254,7 +290,8 @@
                                 </StackPanel>
                                 <TextBox
                                     Grid.Column="1"
-                                    Width="90"
+                                    Width="72"
+                                    VerticalAlignment="Center"
                                     HorizontalContentAlignment="Center"
                                     AutomationProperties.Name="{loc:T settings.historyLimit}"
                                     Text="{Binding HistoryLimit}" />
@@ -270,17 +307,18 @@
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Style="{StaticResource Setting.Label}" Text="{loc:T settings.dataFolder}" />
                                     <TextBlock
-                                        MaxWidth="440"
+                                        MaxWidth="380"
                                         HorizontalAlignment="Left"
                                         Style="{StaticResource Text.Mono}"
                                         Foreground="{DynamicResource Brush.Text.Tertiary}"
-                                        Margin="0,4,0,0"
+                                        Margin="0,2,0,0"
                                         Text="{Binding DataDirectory}"
                                         TextTrimming="CharacterEllipsis"
                                         ToolTip="{Binding DataDirectory}" />
                                 </StackPanel>
                                 <Button
                                     Grid.Column="1"
+                                    VerticalAlignment="Center"
                                     Command="{Binding OpenDataFolderCommand}"
                                     Content="{loc:T settings.openDataFolder}"
                                     Tag="{StaticResource Icon.Folder}" />
@@ -299,6 +337,7 @@
                                 </StackPanel>
                                 <Button
                                     Grid.Column="1"
+                                    VerticalAlignment="Center"
                                     Command="{Binding ResetCommand}"
                                     Content="{loc:T settings.reset}"
                                     Style="{StaticResource Button.Danger}"

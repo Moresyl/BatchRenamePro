@@ -18,7 +18,7 @@
         <!-- ==== A rule card ================================================================ -->
 
         <DataTemplate x:Key="Rule.Card" DataType="{x:Type vm:RuleCardViewModel}">
-            <Border Margin="0,0,0,8" Style="{StaticResource Card}">
+            <Border Margin="0,0,0,6" Style="{StaticResource Card}">
                 <StackPanel>
 
                     <!-- The whole header is the expander: a 40px-wide chevron hit target would be
@@ -33,7 +33,7 @@
                             <ControlTemplate TargetType="ToggleButton">
                                 <Border
                                     x:Name="Root"
-                                    Padding="10,8"
+                                    Padding="8,6"
                                     Background="Transparent"
                                     CornerRadius="{StaticResource Radius.Large}">
                                     <ContentPresenter />
@@ -57,23 +57,23 @@
 
                             <Path
                                 x:Name="Chevron"
-                                Width="12"
-                                Height="12"
-                                Margin="0,0,8,0"
+                                Width="{StaticResource Size.Icon.Small}"
+                                Height="{StaticResource Size.Icon.Small}"
+                                Margin="0,0,6,0"
                                 Data="{StaticResource Icon.ChevronRight}"
                                 Fill="{DynamicResource Brush.Text.Tertiary}"
                                 Style="{StaticResource Icon}" />
 
                             <Border
                                 Grid.Column="1"
-                                Width="30"
-                                Height="30"
-                                Margin="0,0,10,0"
+                                Width="24"
+                                Height="24"
+                                Margin="0,0,8,0"
                                 Background="{DynamicResource Brush.Accent.Subtle}"
-                                CornerRadius="{StaticResource Radius.Medium}">
+                                CornerRadius="{StaticResource Radius.Small}">
                                 <Path
-                                    Width="15"
-                                    Height="15"
+                                    Width="13"
+                                    Height="13"
                                     Data="{Binding IconKey, Converter={StaticResource Resource}}"
                                     Style="{StaticResource Icon.Accent}"
                                     HorizontalAlignment="Center" />
@@ -90,9 +90,9 @@
                             <Path
                                 x:Name="Problem"
                                 Grid.Column="3"
-                                Width="15"
-                                Height="15"
-                                Margin="6,0"
+                                Width="13"
+                                Height="13"
+                                Margin="5,0"
                                 Data="{StaticResource Icon.Warning}"
                                 Fill="{DynamicResource Brush.Warning}"
                                 Style="{StaticResource Icon}"
@@ -100,7 +100,7 @@
 
                             <ToggleButton
                                 Grid.Column="4"
-                                Margin="6,0,0,0"
+                                Margin="5,0,0,0"
                                 IsChecked="{Binding IsEnabled}"
                                 Style="{StaticResource Switch}"
                                 ToolTip="{loc:T rules.enable}" />
@@ -109,7 +109,7 @@
 
                     <!-- Problems, when the rule cannot do what it says. -->
                     <ItemsControl
-                        Margin="12,0,12,8"
+                        Margin="9,0,9,6"
                         ItemsSource="{Binding Problems}"
                         Visibility="{Binding HasProblems, Converter={StaticResource BoolToVisibility}}">
                         <ItemsControl.ItemContainerStyle>
@@ -121,21 +121,21 @@
                             <DataTemplate DataType="{x:Type vm:RuleProblem}">
                                 <Border
                                     x:Name="Chrome"
-                                    Margin="0,0,0,4"
-                                    Padding="8,5"
+                                    Margin="0,0,0,3"
+                                    Padding="7,4"
                                     Background="{DynamicResource Brush.Warning.Bg}"
                                     CornerRadius="{StaticResource Radius.Small}">
                                     <StackPanel Orientation="Horizontal">
                                         <Path
                                             x:Name="Glyph"
-                                            Width="13"
-                                            Height="13"
-                                            Margin="0,0,7,0"
+                                            Width="12"
+                                            Height="12"
+                                            Margin="0,0,6,0"
                                             Data="{StaticResource Icon.Warning}"
                                             Fill="{DynamicResource Brush.Warning}"
                                             Style="{StaticResource Icon}" />
                                         <TextBlock
-                                            MaxWidth="260"
+                                            MaxWidth="230"
                                             Style="{StaticResource Text.Caption}"
                                             Text="{Binding Message}"
                                             TextWrapping="Wrap" />
@@ -154,9 +154,9 @@
 
                     <!-- The editor, plus the actions that only make sense on an open card. -->
                     <StackPanel
-                        Margin="12,4,12,12"
+                        Margin="9,2,9,8"
                         Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVisibility}}">
-                        <Border Margin="0,0,0,12" Style="{StaticResource Divider}" />
+                        <Border Margin="0,0,0,8" Style="{StaticResource Divider}" />
                         <ContentControl Content="{Binding Rule}" />
 
                         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
@@ -210,12 +210,12 @@
         <!-- ==== A preview row ============================================================== -->
 
         <DataTemplate x:Key="Preview.Row" DataType="{x:Type planning:RenamePlanItem}">
-            <Grid Height="26">
+            <Grid Height="{StaticResource Size.Row}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="26" />
+                    <ColumnDefinition Width="20" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="124" />
+                    <ColumnDefinition Width="104" />
                 </Grid.ColumnDefinitions>
 
                 <TextBlock
@@ -230,8 +230,8 @@
 
                 <Path
                     Grid.Column="1"
-                    Width="12"
-                    Height="12"
+                    Width="{StaticResource Size.Icon.Small}"
+                    Height="{StaticResource Size.Icon.Small}"
                     Data="{StaticResource Icon.Arrow}"
                     Fill="{DynamicResource Brush.Text.Tertiary}"
                     Style="{StaticResource Icon}"
@@ -255,9 +255,9 @@
                     ToolTip="{Binding StatusMessage}">
                     <Path
                         x:Name="StatusIcon"
-                        Width="13"
-                        Height="13"
-                        Margin="0,0,6,0"
+                        Width="12"
+                        Height="12"
+                        Margin="0,0,5,0"
                         Data="{StaticResource Icon.Check}"
                         Fill="{DynamicResource Brush.Success}"
                         Style="{StaticResource Icon}" />
@@ -327,505 +327,526 @@
 
     <!-- ==================================================================================== -->
 
-    <Grid Margin="0,0,16,16">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="380" />
-            <ColumnDefinition Width="16" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+    <!--
+        Two panels over one command bar. The bar spans the page rather than sitting inside the
+        preview panel, because what it does — run the batch, undo it, decide what happens to a
+        conflict — is the outcome of both halves, not of the file list alone.
+    -->
+    <Grid Margin="10,2,10,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-        <!-- ==== Rules ===================================================================== -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <Border Style="{StaticResource Panel}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+            <!-- ==== Rules ================================================================= -->
 
-                <Grid Margin="16,14,12,10">
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Style="{StaticResource Text.Subtitle}"
-                        Text="{loc:T rules.title}" />
+            <Border Style="{StaticResource Panel}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                    <!--
-                        The label lives inside the template rather than in Content, so the automation
-                        peer has nothing to fall back on; it is named from the same key the template
-                        draws.
-                    -->
-                    <ToggleButton
-                        x:Name="AddRuleToggle"
-                        AutomationProperties.Name="{loc:T rules.add}"
-                        HorizontalAlignment="Right"
-                        Cursor="Hand">
-                        <ToggleButton.Template>
-                            <ControlTemplate TargetType="ToggleButton">
-                                <Border
-                                    x:Name="Chrome"
-                                    Padding="14,0"
-                                    Height="34"
-                                    Background="{DynamicResource Brush.Accent.Gradient}"
-                                    CornerRadius="{StaticResource Radius.Medium}">
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Path
-                                            Width="14"
-                                            Height="14"
-                                            Margin="0,0,7,0"
-                                            Data="{StaticResource Icon.Add}"
-                                            Fill="{DynamicResource Brush.Text.OnAccent}"
-                                            Style="{StaticResource Icon}" />
-                                        <TextBlock
-                                            FontWeight="SemiBold"
-                                            Foreground="{DynamicResource Brush.Text.OnAccent}"
-                                            Style="{StaticResource Text.Body}"
-                                            Text="{loc:T rules.add}" />
-                                    </StackPanel>
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Brush.Accent.GradientHover}" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </ToggleButton.Template>
-                    </ToggleButton>
+                    <Grid Margin="10,8,8,6">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource Text.Subtitle}"
+                            Text="{loc:T rules.title}" />
 
-                    <Popup
-                        AllowsTransparency="True"
-                        IsOpen="{Binding IsChecked, ElementName=AddRuleToggle, Mode=TwoWay}"
-                        Placement="Bottom"
-                        PlacementTarget="{Binding ElementName=AddRuleToggle}"
-                        StaysOpen="False"
-                        VerticalOffset="4">
-                        <Border
-                            Width="330"
-                            Margin="10"
-                            Padding="4,8"
-                            Background="{DynamicResource Brush.Bg.Flyout}"
-                            BorderBrush="{DynamicResource Brush.Stroke.Default}"
-                            BorderThickness="1"
-                            CornerRadius="{StaticResource Radius.Large}"
-                            Effect="{DynamicResource Effect.Shadow.Flyout}">
-                            <ItemsControl ItemsSource="{x:Static vm:RenameViewModel.AvailableRules}">
+                        <!--
+                            The label lives inside the template rather than in Content, so the
+                            automation peer has nothing to fall back on; it is named from the same
+                            key the template draws.
+                        -->
+                        <ToggleButton
+                            x:Name="AddRuleToggle"
+                            AutomationProperties.Name="{loc:T rules.add}"
+                            HorizontalAlignment="Right"
+                            Cursor="Hand">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border
+                                        x:Name="Chrome"
+                                        Height="{StaticResource Size.Control}"
+                                        Padding="10,0"
+                                        Background="{DynamicResource Brush.Accent.Default}"
+                                        CornerRadius="{StaticResource Radius.Medium}">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Path
+                                                Width="{StaticResource Size.Icon}"
+                                                Height="{StaticResource Size.Icon}"
+                                                Margin="0,0,6,0"
+                                                Data="{StaticResource Icon.Add}"
+                                                Fill="{DynamicResource Brush.Text.OnAccent}"
+                                                Style="{StaticResource Icon}" />
+                                            <TextBlock
+                                                FontWeight="SemiBold"
+                                                Foreground="{DynamicResource Brush.Text.OnAccent}"
+                                                Style="{StaticResource Text.Body}"
+                                                Text="{loc:T rules.add}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Brush.Accent.Hover}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+
+                        <Popup
+                            AllowsTransparency="True"
+                            IsOpen="{Binding IsChecked, ElementName=AddRuleToggle, Mode=TwoWay}"
+                            Placement="Bottom"
+                            PlacementTarget="{Binding ElementName=AddRuleToggle}"
+                            StaysOpen="False"
+                            VerticalOffset="3">
+                            <Border
+                                Width="296"
+                                Margin="8"
+                                Padding="3,5"
+                                Background="{DynamicResource Brush.Bg.Flyout}"
+                                BorderBrush="{DynamicResource Brush.Stroke.Default}"
+                                BorderThickness="1"
+                                CornerRadius="{StaticResource Radius.Large}"
+                                Effect="{DynamicResource Effect.Shadow.Flyout}">
+                                <ItemsControl ItemsSource="{x:Static vm:RenameViewModel.AvailableRules}">
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="AutomationProperties.Name" Value="{Binding NameCode, Converter={StaticResource Localize}}" />
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:RuleDescriptor}">
+                                            <!-- The face is an icon plus two lines of text, not string content. -->
+                                            <Button
+                                                Padding="8,6"
+                                                AutomationProperties.Name="{Binding NameCode, Converter={StaticResource Localize}}"
+                                                AutomationProperties.HelpText="{Binding SummaryCode, Converter={StaticResource Localize}}"
+                                                HorizontalContentAlignment="Left"
+                                                Click="OnRulePicked"
+                                                Command="{Binding DataContext.AddRuleCommand, RelativeSource={RelativeSource AncestorType=views:RenamePage}}"
+                                                CommandParameter="{Binding}"
+                                                Style="{StaticResource Button.Subtle}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path
+                                                        Width="15"
+                                                        Height="15"
+                                                        Margin="0,0,9,0"
+                                                        Data="{Binding IconKey, Converter={StaticResource Resource}}"
+                                                        Style="{StaticResource Icon.Accent}" />
+                                                    <StackPanel>
+                                                        <TextBlock
+                                                            Style="{StaticResource Text.BodyStrong}"
+                                                            Text="{Binding NameCode, Converter={StaticResource Localize}}" />
+                                                        <TextBlock
+                                                            MaxWidth="215"
+                                                            Style="{StaticResource Text.Caption}"
+                                                            Text="{Binding SummaryCode, Converter={StaticResource Localize}}"
+                                                            TextTrimming="CharacterEllipsis" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Popup>
+                    </Grid>
+
+                    <ScrollViewer
+                        Grid.Row="1"
+                        Padding="10,0,8,0"
+                        VerticalScrollBarVisibility="Auto">
+                        <Grid>
+                            <ItemsControl ItemTemplate="{StaticResource Rule.Card}" ItemsSource="{Binding Rules}">
                                 <ItemsControl.ItemContainerStyle>
                                     <Style TargetType="ContentPresenter">
-                                        <Setter Property="AutomationProperties.Name" Value="{Binding NameCode, Converter={StaticResource Localize}}" />
+                                        <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
                                     </Style>
                                 </ItemsControl.ItemContainerStyle>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate DataType="{x:Type vm:RuleDescriptor}">
-                                        <!-- The face is an icon plus two lines of text, not string content. -->
-                                        <Button
-                                            Padding="10,8"
-                                            AutomationProperties.Name="{Binding NameCode, Converter={StaticResource Localize}}"
-                                            AutomationProperties.HelpText="{Binding SummaryCode, Converter={StaticResource Localize}}"
-                                            HorizontalContentAlignment="Left"
-                                            Click="OnRulePicked"
-                                            Command="{Binding DataContext.AddRuleCommand, RelativeSource={RelativeSource AncestorType=views:RenamePage}}"
-                                            CommandParameter="{Binding}"
-                                            Style="{StaticResource Button.Subtle}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <Path
-                                                    Width="16"
-                                                    Height="16"
-                                                    Margin="0,0,12,0"
-                                                    Data="{Binding IconKey, Converter={StaticResource Resource}}"
-                                                    Style="{StaticResource Icon.Accent}" />
-                                                <StackPanel>
-                                                    <TextBlock
-                                                        Style="{StaticResource Text.BodyStrong}"
-                                                        Text="{Binding NameCode, Converter={StaticResource Localize}}" />
-                                                    <TextBlock
-                                                        MaxWidth="240"
-                                                        Style="{StaticResource Text.Caption}"
-                                                        Text="{Binding SummaryCode, Converter={StaticResource Localize}}"
-                                                        TextTrimming="CharacterEllipsis" />
-                                                </StackPanel>
-                                            </StackPanel>
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                        </Border>
-                    </Popup>
+
+                            <!-- Empty state -->
+                            <StackPanel
+                                Margin="0,40,0,0"
+                                VerticalAlignment="Top"
+                                Visibility="{Binding HasRules, Converter={StaticResource BoolToVisibilityInverse}}">
+                                <Path
+                                    Width="32"
+                                    Height="32"
+                                    Margin="0,0,0,10"
+                                    Data="{StaticResource Icon.Pattern}"
+                                    Fill="{DynamicResource Brush.Text.Disabled}"
+                                    Style="{StaticResource Icon}"
+                                    HorizontalAlignment="Center" />
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    Style="{StaticResource Text.BodyStrong}"
+                                    Text="{loc:T rules.empty.title}" />
+                                <TextBlock
+                                    MaxWidth="230"
+                                    Margin="0,4,0,0"
+                                    HorizontalAlignment="Center"
+                                    Style="{StaticResource Text.Caption}"
+                                    Text="{loc:T rules.empty.hint}"
+                                    TextAlignment="Center"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Grid>
+                    </ScrollViewer>
+
+                    <Border Grid.Row="2" Padding="10,6">
+                        <StackPanel Orientation="Horizontal">
+                            <Button
+                                Command="{Binding SavePresetCommand}"
+                                Content="{loc:T presets.save}"
+                                Style="{StaticResource Button.Subtle}"
+                                Tag="{StaticResource Icon.Save}" />
+                            <Button
+                                Margin="3,0,0,0"
+                                Command="{Binding ClearRulesCommand}"
+                                Content="{loc:T rules.clear}"
+                                Style="{StaticResource Button.Subtle}"
+                                Tag="{StaticResource Icon.Clear}" />
+                        </StackPanel>
+                    </Border>
                 </Grid>
+            </Border>
 
-                <ScrollViewer
-                    Grid.Row="1"
-                    Padding="16,0,12,0"
-                    VerticalScrollBarVisibility="Auto">
-                    <Grid>
-                        <ItemsControl ItemTemplate="{StaticResource Rule.Card}" ItemsSource="{Binding Rules}">
-                            <ItemsControl.ItemContainerStyle>
-                                <Style TargetType="ContentPresenter">
-                                    <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
-                                </Style>
-                            </ItemsControl.ItemContainerStyle>
-                        </ItemsControl>
+            <!-- ==== Sources and preview =================================================== -->
 
-                        <!-- Empty state -->
+            <Border Grid.Column="2" Style="{StaticResource Panel}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Source toolbar -->
+                    <Grid Margin="10,8,10,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--
+                            Opens whichever of the two folder pickers the settings ask for — the
+                            shell's by default. The tooltip points at the setting rather than
+                            describing either one, because the reason to go looking for it only
+                            turns up after the shell dialog has shown someone an empty folder.
+                        -->
+                        <Button
+                            Command="{Binding AddFolderCommand}"
+                            Content="{loc:T source.addFolder}"
+                            Tag="{StaticResource Icon.Folder}"
+                            ToolTip="{loc:T source.addFolder.hint}" />
+                        <Button
+                            Grid.Column="1"
+                            Margin="6,0,0,0"
+                            Command="{Binding AddFilesCommand}"
+                            Content="{loc:T source.addFiles}"
+                            Tag="{StaticResource Icon.File}" />
+
+                        <Border
+                            Grid.Column="3"
+                            Margin="8,0,0,0"
+                            Style="{StaticResource Chip}"
+                            Visibility="{Binding HasSources, Converter={StaticResource BoolToVisibility}}">
+                            <TextBlock
+                                Style="{StaticResource Text.Caption}"
+                                Text="{Binding SourceCount, Converter={StaticResource Format}, ConverterParameter=source.count}" />
+                        </Border>
+
+                        <ToggleButton
+                            x:Name="FilterToggle"
+                            Grid.Column="4"
+                            Width="{StaticResource Size.Control}"
+                            Height="{StaticResource Size.Control}"
+                            Margin="6,0,0,0"
+                            Cursor="Hand"
+                            IsChecked="False"
+                            ToolTip="{loc:T source.filter}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border
+                                        x:Name="Chrome"
+                                        Background="Transparent"
+                                        CornerRadius="{StaticResource Radius.Medium}">
+                                        <Path
+                                            Data="{StaticResource Icon.Filter}"
+                                            Fill="{DynamicResource Brush.Text.Secondary}"
+                                            Style="{StaticResource Icon}"
+                                            HorizontalAlignment="Center" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Brush.Bg.SubtleHover}" />
+                                        </Trigger>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Brush.Bg.Selected}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+
+                        <Button
+                            Grid.Column="5"
+                            Command="{Binding RefreshCommand}"
+                            Style="{StaticResource Button.Icon}"
+                            Tag="{StaticResource Icon.Refresh}"
+                            ToolTip="{loc:T source.refresh}" />
+                        <Button
+                            Grid.Column="6"
+                            Command="{Binding ClearSourcesCommand}"
+                            Style="{StaticResource Button.Icon}"
+                            Tag="{StaticResource Icon.Clear}"
+                            ToolTip="{loc:T source.clear}" />
+                    </Grid>
+
+                    <!-- Scan options, folded away until asked for -->
+                    <Border
+                        Grid.Row="1"
+                        Margin="10,0,10,6"
+                        Padding="10,8"
+                        Background="{DynamicResource Brush.Bg.Subtle}"
+                        CornerRadius="{StaticResource Radius.Medium}"
+                        Visibility="{Binding IsChecked, ElementName=FilterToggle, Converter={StaticResource BoolToVisibility}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock
+                                Margin="2,0,0,3"
+                                Style="{StaticResource Text.Caption}"
+                                Text="{loc:T source.filter}" />
+                            <TextBox
+                                Grid.Row="1"
+                                controls:Hint.Text="{loc:T source.filter.hint}"
+                                Text="{Binding IncludePatterns, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <TextBlock
+                                Grid.Column="2"
+                                Margin="2,0,0,3"
+                                Style="{StaticResource Text.Caption}"
+                                Text="{loc:T source.exclude.hint}" />
+                            <TextBox
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                controls:Hint.Text="{loc:T source.exclude.hint}"
+                                Text="{Binding ExcludePatterns, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <TextBlock
+                                Grid.Column="4"
+                                Margin="2,0,0,3"
+                                Style="{StaticResource Text.Caption}"
+                                Text="{loc:T source.target}" />
+                            <StackPanel
+                                Grid.Row="1"
+                                Grid.Column="4"
+                                Orientation="Horizontal">
+                                <ComboBox
+                                    Width="128"
+                                    DisplayMemberPath="Text"
+                                    ItemsSource="{loc:EnumSource {x:Type scanning:ScanTarget}}"
+                                    SelectedValue="{Binding ScanTarget}"
+                                    SelectedValuePath="Value" />
+                                <CheckBox
+                                    Margin="10,0,0,0"
+                                    Content="{loc:T source.recursive}"
+                                    IsChecked="{Binding Recursive}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Column headings. The right inset clears the list's scroll bar so the
+                         headings stay over the columns they name. -->
+                    <Grid
+                        Grid.Row="2"
+                        Height="24"
+                        Margin="10,0,20,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="104" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock
+                            Margin="6,0,0,0"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource Text.Section}"
+                            Text="{loc:T preview.column.original}" />
+                        <TextBlock
+                            Grid.Column="2"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource Text.Section}"
+                            Text="{loc:T preview.column.proposed}" />
+                        <TextBlock
+                            Grid.Column="3"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource Text.Section}"
+                            Text="{loc:T preview.column.status}" />
+
+                        <Border
+                            Grid.ColumnSpan="4"
+                            Margin="0"
+                            VerticalAlignment="Bottom"
+                            Style="{StaticResource Divider}" />
+                    </Grid>
+
+                    <!-- The preview -->
+                    <Grid Grid.Row="3" Margin="10,0,10,8">
+                        <ListBox
+                            x:Name="PreviewList"
+                            ItemContainerStyle="{StaticResource Preview.Entry}"
+                            ItemTemplate="{StaticResource Preview.Row}"
+                            ItemsSource="{Binding Rows}"
+                            SelectionMode="Extended">
+                            <ListBox.InputBindings>
+                                <KeyBinding
+                                    Key="Delete"
+                                    Command="{Binding RemoveSelectedCommand}"
+                                    CommandParameter="{Binding SelectedItems, ElementName=PreviewList}" />
+                            </ListBox.InputBindings>
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem
+                                        Command="{Binding PlacementTarget.DataContext.RevealInExplorerCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                        CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                        Header="{loc:T action.openFolder}"
+                                        Icon="{StaticResource Icon.Folder}" />
+                                    <Separator />
+                                    <MenuItem
+                                        Command="{Binding PlacementTarget.DataContext.RemoveSelectedCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                        CommandParameter="{Binding PlacementTarget.SelectedItems, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                        Header="{loc:T source.remove}"
+                                        Icon="{StaticResource Icon.Delete}" />
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
+                        </ListBox>
+
+                        <!-- Empty states: nothing selected, or nothing left after the filter -->
                         <StackPanel
-                            Margin="0,60,0,0"
-                            VerticalAlignment="Top"
-                            Visibility="{Binding HasRules, Converter={StaticResource BoolToVisibilityInverse}}">
+                            VerticalAlignment="Center"
+                            IsHitTestVisible="False"
+                            Visibility="{Binding HasSources, Converter={StaticResource BoolToVisibilityInverse}}">
                             <Path
-                                Width="44"
-                                Height="44"
-                                Margin="0,0,0,16"
-                                Data="{StaticResource Icon.Pattern}"
+                                Width="38"
+                                Height="38"
+                                Margin="0,0,0,12"
+                                Data="{StaticResource Icon.Folder}"
                                 Fill="{DynamicResource Brush.Text.Disabled}"
                                 Style="{StaticResource Icon}"
                                 HorizontalAlignment="Center" />
                             <TextBlock
                                 HorizontalAlignment="Center"
-                                Style="{StaticResource Text.BodyStrong}"
-                                Text="{loc:T rules.empty.title}" />
+                                Style="{StaticResource Text.Subtitle}"
+                                Text="{loc:T source.empty.title}" />
                             <TextBlock
-                                MaxWidth="260"
-                                Margin="0,6,0,0"
+                                Margin="0,5,0,0"
                                 HorizontalAlignment="Center"
-                                Style="{StaticResource Text.Caption}"
-                                Text="{loc:T rules.empty.hint}"
-                                TextAlignment="Center"
-                                TextWrapping="Wrap" />
+                                Style="{StaticResource Text.Secondary}"
+                                Text="{loc:T source.empty.hint}" />
                         </StackPanel>
                     </Grid>
-                </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
 
-                <Border Grid.Row="2" Padding="16,10">
-                    <StackPanel Orientation="Horizontal">
-                        <Button
-                            Command="{Binding SavePresetCommand}"
-                            Content="{loc:T presets.save}"
-                            Style="{StaticResource Button.Subtle}"
-                            Tag="{StaticResource Icon.Save}" />
-                        <Button
-                            Margin="4,0,0,0"
-                            Command="{Binding ClearRulesCommand}"
-                            Content="{loc:T rules.clear}"
-                            Style="{StaticResource Button.Subtle}"
-                            Tag="{StaticResource Icon.Clear}" />
-                    </StackPanel>
-                </Border>
-            </Grid>
-        </Border>
+        <!-- ==== Command bar ================================================================ -->
 
-        <!-- ==== Sources and preview ======================================================== -->
-
-        <Border Grid.Column="2" Style="{StaticResource Panel}">
+        <Border
+            Grid.Row="1"
+            Margin="0,8,0,0"
+            Padding="2,8,2,0"
+            BorderBrush="{DynamicResource Brush.Stroke.Divider}"
+            BorderThickness="0,1,0,0">
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                <!-- Source toolbar -->
-                <Grid Margin="16,14,16,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <Button
-                        Command="{Binding AddFolderCommand}"
-                        Content="{loc:T source.addFolder}"
-                        Tag="{StaticResource Icon.Folder}" />
-                    <Button
-                        Grid.Column="1"
-                        Margin="8,0,0,0"
-                        Command="{Binding AddFilesCommand}"
-                        Content="{loc:T source.addFiles}"
-                        Tag="{StaticResource Icon.File}" />
-
-                    <Border
-                        Grid.Column="3"
-                        Margin="12,0,0,0"
-                        Style="{StaticResource Chip}"
-                        Visibility="{Binding HasSources, Converter={StaticResource BoolToVisibility}}">
-                        <TextBlock
-                            Style="{StaticResource Text.Caption}"
-                            Text="{Binding SourceCount, Converter={StaticResource Format}, ConverterParameter=source.count}" />
-                    </Border>
-
-                    <ToggleButton
-                        x:Name="FilterToggle"
-                        Grid.Column="4"
-                        Width="34"
-                        Height="34"
-                        Margin="8,0,0,0"
-                        Cursor="Hand"
-                        IsChecked="False"
-                        ToolTip="{loc:T source.filter}">
-                        <ToggleButton.Template>
-                            <ControlTemplate TargetType="ToggleButton">
-                                <Border
-                                    x:Name="Chrome"
-                                    Background="Transparent"
-                                    CornerRadius="{StaticResource Radius.Medium}">
-                                    <Path
-                                        Data="{StaticResource Icon.Filter}"
-                                        Fill="{DynamicResource Brush.Text.Secondary}"
-                                        Style="{StaticResource Icon}"
-                                        HorizontalAlignment="Center" />
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Brush.Bg.SubtleHover}" />
-                                    </Trigger>
-                                    <Trigger Property="IsChecked" Value="True">
-                                        <Setter TargetName="Chrome" Property="Background" Value="{DynamicResource Brush.Bg.Selected}" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </ToggleButton.Template>
-                    </ToggleButton>
-
-                    <Button
-                        Grid.Column="5"
-                        Command="{Binding RefreshCommand}"
-                        Style="{StaticResource Button.Icon}"
-                        Tag="{StaticResource Icon.Refresh}"
-                        ToolTip="{loc:T source.refresh}" />
-                    <Button
-                        Grid.Column="6"
-                        Command="{Binding ClearSourcesCommand}"
-                        Style="{StaticResource Button.Icon}"
-                        Tag="{StaticResource Icon.Clear}"
-                        ToolTip="{loc:T source.clear}" />
-                </Grid>
-
-                <!-- Scan options, folded away until asked for -->
-                <Border
-                    Grid.Row="1"
-                    Margin="16,0,16,10"
-                    Padding="14,12"
-                    Background="{DynamicResource Brush.Bg.Subtle}"
-                    CornerRadius="{StaticResource Radius.Medium}"
-                    Visibility="{Binding IsChecked, ElementName=FilterToggle, Converter={StaticResource BoolToVisibility}}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="12" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="16" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <TextBlock
-                            Margin="2,0,0,5"
-                            Style="{StaticResource Text.Caption}"
-                            Text="{loc:T source.filter}" />
-                        <TextBox
-                            Grid.Row="1"
-                            controls:Hint.Text="{loc:T source.filter.hint}"
-                            Text="{Binding IncludePatterns, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <TextBlock
-                            Grid.Column="2"
-                            Margin="2,0,0,5"
-                            Style="{StaticResource Text.Caption}"
-                            Text="{loc:T source.exclude.hint}" />
-                        <TextBox
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            controls:Hint.Text="{loc:T source.exclude.hint}"
-                            Text="{Binding ExcludePatterns, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <TextBlock
-                            Grid.Column="4"
-                            Margin="2,0,0,5"
-                            Style="{StaticResource Text.Caption}"
-                            Text="{loc:T source.target}" />
-                        <StackPanel
-                            Grid.Row="1"
-                            Grid.Column="4"
-                            Orientation="Horizontal">
-                            <ComboBox
-                                Width="150"
-                                DisplayMemberPath="Text"
-                                ItemsSource="{loc:EnumSource {x:Type scanning:ScanTarget}}"
-                                SelectedValue="{Binding ScanTarget}"
-                                SelectedValuePath="Value" />
-                            <CheckBox
-                                Margin="14,0,0,0"
-                                Content="{loc:T source.recursive}"
-                                IsChecked="{Binding Recursive}" />
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <!-- Column headings -->
-                <Grid
-                    Grid.Row="2"
-                    Margin="16,0,28,0"
-                    Height="30">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="26" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="124" />
-                    </Grid.ColumnDefinitions>
-
+                <StackPanel VerticalAlignment="Center">
                     <TextBlock
-                        VerticalAlignment="Center"
-                        Style="{StaticResource Text.Section}"
-                        Margin="10,0,0,0"
-                        Text="{loc:T preview.column.original}" />
-                    <TextBlock
-                        Grid.Column="2"
-                        VerticalAlignment="Center"
-                        Style="{StaticResource Text.Section}"
-                        Text="{loc:T preview.column.proposed}" />
-                    <TextBlock
-                        Grid.Column="3"
-                        VerticalAlignment="Center"
-                        Style="{StaticResource Text.Section}"
-                        Text="{loc:T preview.column.status}" />
-
-                    <Border
-                        VerticalAlignment="Bottom"
-                        Grid.ColumnSpan="4"
-                        Style="{StaticResource Divider}"
-                        Margin="0" />
-                </Grid>
-
-                <!-- The preview -->
-                <Grid Grid.Row="3" Margin="16,0,16,0">
-                    <ListBox
-                        x:Name="PreviewList"
-                        ItemContainerStyle="{StaticResource Preview.Entry}"
-                        ItemTemplate="{StaticResource Preview.Row}"
-                        ItemsSource="{Binding Rows}"
-                        SelectionMode="Extended">
-                        <ListBox.InputBindings>
-                            <KeyBinding
-                                Key="Delete"
-                                Command="{Binding RemoveSelectedCommand}"
-                                CommandParameter="{Binding SelectedItems, ElementName=PreviewList}" />
-                        </ListBox.InputBindings>
-                        <ListBox.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem
-                                    Command="{Binding PlacementTarget.DataContext.RevealInExplorerCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                    CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                    Header="{loc:T action.openFolder}"
-                                    Icon="{StaticResource Icon.Folder}" />
-                                <Separator />
-                                <MenuItem
-                                    Command="{Binding PlacementTarget.DataContext.RemoveSelectedCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                    CommandParameter="{Binding PlacementTarget.SelectedItems, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                                    Header="{loc:T source.remove}"
-                                    Icon="{StaticResource Icon.Delete}" />
-                            </ContextMenu>
-                        </ListBox.ContextMenu>
-                    </ListBox>
-
-                    <!-- Empty states: nothing selected, or nothing left after the filter -->
+                        Style="{StaticResource Text.Body}"
+                        Text="{Binding Summary}"
+                        TextTrimming="CharacterEllipsis" />
                     <StackPanel
-                        VerticalAlignment="Center"
-                        IsHitTestVisible="False"
-                        Visibility="{Binding HasSources, Converter={StaticResource BoolToVisibilityInverse}}">
-                        <Path
-                            Width="52"
-                            Height="52"
-                            Margin="0,0,0,18"
-                            Data="{StaticResource Icon.Folder}"
-                            Fill="{DynamicResource Brush.Text.Disabled}"
-                            Style="{StaticResource Icon}"
-                            HorizontalAlignment="Center" />
+                        Margin="0,5,0,0"
+                        Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}">
+                        <ProgressBar
+                            Maximum="1"
+                            Minimum="0"
+                            Value="{Binding Progress, Mode=OneWay}" />
                         <TextBlock
-                            HorizontalAlignment="Center"
-                            Style="{StaticResource Text.Subtitle}"
-                            Text="{loc:T source.empty.title}" />
-                        <TextBlock
-                            Margin="0,8,0,0"
-                            HorizontalAlignment="Center"
-                            Style="{StaticResource Text.Secondary}"
-                            Text="{loc:T source.empty.hint}" />
+                            Margin="0,3,0,0"
+                            Style="{StaticResource Text.Caption}"
+                            Text="{Binding ProgressText}" />
                     </StackPanel>
-                </Grid>
+                </StackPanel>
 
-                <!-- Action bar -->
-                <Border
-                    Grid.Row="4"
-                    Padding="16,12"
-                    Background="{DynamicResource Brush.Bg.Subtle}"
-                    CornerRadius="0,0,11,11">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock
-                                Style="{StaticResource Text.Body}"
-                                Text="{Binding Summary}"
-                                TextTrimming="CharacterEllipsis" />
-                            <StackPanel
-                                Margin="0,7,0,0"
-                                Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}">
-                                <ProgressBar
-                                    Maximum="1"
-                                    Minimum="0"
-                                    Value="{Binding Progress, Mode=OneWay}" />
-                                <TextBlock
-                                    Margin="0,5,0,0"
-                                    Style="{StaticResource Text.Caption}"
-                                    Text="{Binding ProgressText}" />
-                            </StackPanel>
-                        </StackPanel>
-
-                        <StackPanel
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            Orientation="Horizontal">
-                            <CheckBox
-                                Margin="0,0,16,0"
-                                Content="{loc:T preview.showOnlyChanged}"
-                                IsChecked="{Binding ShowOnlyChanged}" />
-                            <ComboBox
-                                Width="160"
-                                Margin="0,0,10,0"
-                                DisplayMemberPath="Text"
-                                ItemsSource="{loc:EnumSource {x:Type planning:ConflictPolicy}}"
-                                SelectedValue="{Binding ConflictPolicy}"
-                                SelectedValuePath="Value"
-                                ToolTip="{loc:T preview.conflictPolicy}" />
-                            <Button
-                                Margin="0,0,10,0"
-                                Command="{Binding UndoLastCommand}"
-                                Content="{loc:T action.undoLast}"
-                                Tag="{StaticResource Icon.Undo}" />
-                            <Button
-                                Command="{Binding CancelRunCommand}"
-                                Content="{loc:T action.cancel}"
-                                Style="{StaticResource Button.Danger}"
-                                Tag="{StaticResource Icon.Stop}"
-                                Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
-                            <Button
-                                Command="{Binding RunCommand}"
-                                Content="{Binding Plan.ReadyCount, Converter={StaticResource Format}, ConverterParameter=action.runCount}"
-                                Style="{StaticResource Button.Accent}"
-                                Tag="{StaticResource Icon.Play}"
-                                Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityInverse}}" />
-                        </StackPanel>
-                    </Grid>
-                </Border>
+                <StackPanel
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
+                    <CheckBox
+                        Margin="0,0,12,0"
+                        Content="{loc:T preview.showOnlyChanged}"
+                        IsChecked="{Binding ShowOnlyChanged}" />
+                    <ComboBox
+                        Width="140"
+                        Margin="0,0,8,0"
+                        DisplayMemberPath="Text"
+                        ItemsSource="{loc:EnumSource {x:Type planning:ConflictPolicy}}"
+                        SelectedValue="{Binding ConflictPolicy}"
+                        SelectedValuePath="Value"
+                        ToolTip="{loc:T preview.conflictPolicy}" />
+                    <Button
+                        Margin="0,0,8,0"
+                        Command="{Binding UndoLastCommand}"
+                        Content="{loc:T action.undoLast}"
+                        Tag="{StaticResource Icon.Undo}" />
+                    <Button
+                        Command="{Binding CancelRunCommand}"
+                        Content="{loc:T action.cancel}"
+                        Style="{StaticResource Button.Danger}"
+                        Tag="{StaticResource Icon.Stop}"
+                        Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+                    <Button
+                        Command="{Binding RunCommand}"
+                        Content="{Binding Plan.ReadyCount, Converter={StaticResource Format}, ConverterParameter=action.runCount}"
+                        Style="{StaticResource Button.Accent}"
+                        Tag="{StaticResource Icon.Play}"
+                        Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityInverse}}" />
+                </StackPanel>
             </Grid>
         </Border>
 
@@ -836,7 +857,7 @@
         -->
         <Border
             x:Name="DropOverlay"
-            Grid.ColumnSpan="3"
+            Grid.RowSpan="2"
             Background="{DynamicResource Brush.Accent.Subtle}"
             BorderBrush="{DynamicResource Brush.Accent.Default}"
             BorderThickness="2"
@@ -845,9 +866,9 @@
             Visibility="Collapsed">
             <StackPanel VerticalAlignment="Center">
                 <Path
-                    Width="56"
-                    Height="56"
-                    Margin="0,0,0,18"
+                    Width="40"
+                    Height="40"
+                    Margin="0,0,0,12"
                     Data="{StaticResource Icon.Add}"
                     Fill="{DynamicResource Brush.Accent.Default}"
                     Style="{StaticResource Icon}"

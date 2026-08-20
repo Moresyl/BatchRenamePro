@@ -88,7 +88,7 @@ public sealed class ReplaceRule : RenameRuleBase
     public override NameParts Apply(NameParts input, RenameContext context)
     {
         if (_find.Length == 0) return input;
-        return _scope.Transform(input, Replace);
+        return _scope.Transform(input, context, Replace);
     }
 
     /// <inheritdoc />

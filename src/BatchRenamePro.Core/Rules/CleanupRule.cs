@@ -98,7 +98,7 @@ public sealed class CleanupRule : RenameRuleBase
     }
 
     /// <inheritdoc />
-    public override NameParts Apply(NameParts input, RenameContext context) => _scope.Transform(input, Clean);
+    public override NameParts Apply(NameParts input, RenameContext context) => _scope.Transform(input, context, Clean);
 
     /// <inheritdoc />
     public override IReadOnlyList<RuleDiagnostic> Validate()

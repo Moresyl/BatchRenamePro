@@ -52,7 +52,7 @@ public sealed class NamePartsTests
     {
         var parts = NameParts.Split("photo.JPG");
 
-        var result = RenameScope.Extension.Transform(parts, value =>
+        var result = RenameScope.Extension.Transform(parts, Fixture.Context("photo.JPG"), value =>
         {
             Assert.AreEqual("JPG", value, "the transform should not have to deal with the dot");
             return value.ToLowerInvariant();
@@ -66,7 +66,7 @@ public sealed class NamePartsTests
     {
         var parts = NameParts.Split("a.txt");
 
-        var result = RenameScope.FullName.Transform(parts, _ => "b.md");
+        var result = RenameScope.FullName.Transform(parts, Fixture.Context("a.txt"), _ => "b.md");
 
         Assert.AreEqual("b", result.BaseName);
         Assert.AreEqual(".md", result.Extension);

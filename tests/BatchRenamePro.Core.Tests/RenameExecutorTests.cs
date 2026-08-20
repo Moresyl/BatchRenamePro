@@ -225,4 +225,89 @@ public sealed class RenameExecutorTests
         Assert.IsTrue(Directory.Exists(Path.Combine(directory.Path, "new")));
         Assert.AreEqual("kept", File.ReadAllText(Path.Combine(directory.Path, "new", "inner.txt")));
     }
+
+    /// <summary>Builds the folder-and-contents batch the nested tests below share.</summary>
+    /// <remarks>
+    /// <c>old\inner.txt</c> and <c>old</c> itself, in the order a recursive scan yields them:
+    /// contents first, the folder that holds them last.
+    /// </remarks>
+    private static RenamePlan NestedPlan(TemporaryDirectory directory)
+    {
+        var folder = Path.Combine(directory.Path, "old");
+        Directory.CreateDirectory(folder);
+        File.WriteAllText(Path.Combine(folder, "inner.txt"), "kept");
+
+        return new RenamePlanner().Build(
+            [
+                new RenameSource(Path.Combine(folder, "inner.txt"), false, Fixture.Facts),
+                new RenameSource(folder, true, Fixture.Facts)
+            ],
+            [
+                new MappingRule(new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["inner"] = "renamed",
+                    ["old"] = "new"
+                })
+            ],
+            Deterministic);
+    }
+
+    [TestMethod]
+    public async Task ExecuteAsync_RenamesAFolderAndItsContentsInOneBatch()
+    {
+        using var directory = new TemporaryDirectory();
+
+        await new RenameExecutor().ExecuteAsync(NestedPlan(directory));
+
+        Assert.IsFalse(Directory.Exists(Path.Combine(directory.Path, "old")));
+        Assert.AreEqual("kept", File.ReadAllText(Path.Combine(directory.Path, "new", "renamed.txt")));
+    }
+
+    [TestMethod]
+    public async Task RevertAsync_UndoesAFolderRenamedAlongsideItsContents()
+    {
+        // The undo replays the batch backwards, so the folder goes back to its old name before the
+        // file inside it does. Every path the transaction recorded for that file was written against
+        // the original tree and only becomes real again once the folder has moved back, which is
+        // what the pre-flight check has to allow for.
+        using var directory = new TemporaryDirectory();
+
+        var executor = new RenameExecutor();
+        var transaction = await executor.ExecuteAsync(NestedPlan(directory));
+
+        await executor.RevertAsync(transaction);
+
+        Assert.IsFalse(Directory.Exists(Path.Combine(directory.Path, "new")));
+        Assert.AreEqual("kept", File.ReadAllText(Path.Combine(directory.Path, "old", "inner.txt")));
+    }
+
+    [TestMethod]
+    public async Task ExecuteAsync_RenamesContentsEvenWhenTheFolderIsListedFirst()
+    {
+        // A recursive scan puts the folder last, but a user who adds items by hand can arrange them
+        // any way at all. Once the folder has moved, the path recorded for the file inside it points
+        // at nothing, and the executor has to follow the folder to find it.
+        using var directory = new TemporaryDirectory();
+        var folder = Path.Combine(directory.Path, "old");
+        Directory.CreateDirectory(folder);
+        File.WriteAllText(Path.Combine(folder, "inner.txt"), "kept");
+
+        var plan = new RenamePlanner().Build(
+            [
+                new RenameSource(folder, true, Fixture.Facts),
+                new RenameSource(Path.Combine(folder, "inner.txt"), false, Fixture.Facts)
+            ],
+            [
+                new MappingRule(new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["old"] = "new",
+                    ["inner"] = "renamed"
+                })
+            ],
+            Deterministic);
+
+        await new RenameExecutor().ExecuteAsync(plan);
+
+        Assert.AreEqual("kept", File.ReadAllText(Path.Combine(directory.Path, "new", "renamed.txt")));
+    }
 }

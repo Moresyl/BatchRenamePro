@@ -36,6 +36,9 @@ public static class BuiltInPresets
             new PatternRule { Pattern = "{modified:yyyy-MM-dd}_{name}", Scope = RenameScope.BaseName },
             new NumberRule
             {
+                // The rule before this one built the name; this one only has to distinguish two
+                // photos taken on the same day, so it adds to that name instead of replacing it.
+                ReplacesName = false,
                 Position = InsertPosition.Suffix,
                 Separator = "_",
                 Sequence = new SequenceSettings { Start = 1, Padding = 3 }
@@ -52,6 +55,9 @@ public static class BuiltInPresets
         [
             new NumberRule
             {
+                // Keeping the name is the whole point of this preset — replacing it is what the
+                // rule does on its own, without a preset to ask for.
+                ReplacesName = false,
                 Position = InsertPosition.Prefix,
                 Separator = " - ",
                 Sequence = new SequenceSettings { Start = 1, Padding = 2 }
@@ -88,6 +94,8 @@ public static class BuiltInPresets
         [
             new InsertRule
             {
+                // A date in front of the existing name, which means the existing name stays.
+                ReplacesName = false,
                 Text = "{modified:yyyy-MM-dd} ",
                 Position = InsertPosition.Prefix
             }

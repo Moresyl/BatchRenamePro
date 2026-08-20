@@ -48,6 +48,15 @@ internal static class StringCatalog
     /// <param name="culture">A BCP-47 tag.</param>
     public static bool IsSupported(string culture) => Tables.ContainsKey(culture);
 
+    /// <summary>Every table, keyed by culture.</summary>
+    /// <remarks>
+    /// Exists so the tests can check the languages agree with each other. <see cref="Get" /> falls back
+    /// to English rather than showing a blank, which is the right behaviour at runtime and also means a
+    /// forgotten translation is invisible until a Chinese user meets an English sentence. Comparing the
+    /// key sets is the only way that gets caught before shipping.
+    /// </remarks>
+    public static IReadOnlyDictionary<string, FrozenDictionary<string, string>> All => Tables;
+
     /// <summary>Looks up a key, falling back to English and then to the key itself.</summary>
     /// <param name="culture">A BCP-47 tag.</param>
     /// <param name="key">The string's identifier.</param>
@@ -72,15 +81,15 @@ internal static class StringCatalog
         ["nav.history"] = "历史记录",
         ["nav.settings"] = "设置",
         ["nav.about"] = "关于",
-        ["nav.toggle"] = "展开或收起导航",
         ["window.minimize"] = "最小化",
-        ["window.maximize"] = "最大化",
-        ["window.restore"] = "向下还原",
         ["window.close"] = "关闭",
+        ["tray.show"] = "显示主窗口",
+        ["tray.exit"] = "退出",
 
         // ---- source list ----
         ["source.title"] = "文件",
         ["source.addFolder"] = "添加文件夹",
+        ["source.addFolder.hint"] = "可以一次选多个。想在选定之前先看清文件夹里都有哪些文件，去设置里把文件夹选择器换成「应用内浏览器」。",
         ["source.addFiles"] = "添加文件",
         ["source.clear"] = "清空",
         ["source.remove"] = "移出列表",
@@ -95,6 +104,22 @@ internal static class StringCatalog
         ["source.count"] = "已选 {0} 项",
         ["source.dropHint"] = "松开即可添加",
         ["source.noneAdded"] = "这些位置里没有找到符合条件的文件",
+
+        // ---- folder picker ----
+        ["folderPicker.title"] = "选择文件夹",
+        ["folderPicker.places"] = "快速访问",
+        ["folderPicker.folders"] = "子文件夹",
+        ["folderPicker.files"] = "文件",
+        ["folderPicker.filesCount"] = "文件（{0} 个）",
+        ["folderPicker.noFiles"] = "这个文件夹里没有文件",
+        ["folderPicker.noFolders"] = "没有子文件夹",
+        ["folderPicker.location"] = "位置",
+        ["folderPicker.up"] = "上一级",
+        ["folderPicker.refresh"] = "刷新",
+        ["folderPicker.thisPc"] = "此电脑",
+        ["folderPicker.chooseCurrent"] = "选择当前文件夹",
+        ["folderPicker.chooseOne"] = "选择选中的文件夹",
+        ["folderPicker.chooseMany"] = "选择这 {0} 个文件夹",
 
         // ---- rules ----
         ["rules.title"] = "规则",
@@ -113,8 +138,8 @@ internal static class StringCatalog
         ["rule.pattern.summary"] = "用变量拼出全新的名字",
         ["rule.replace.name"] = "查找替换",
         ["rule.replace.summary"] = "把一段文字换成另一段",
-        ["rule.insert.name"] = "插入文本",
-        ["rule.insert.summary"] = "在开头、结尾或指定位置加字",
+        ["rule.insert.name"] = "文本命名",
+        ["rule.insert.summary"] = "用一段文字命名，也可只加在原名旁边",
         ["rule.remove.name"] = "删除字符",
         ["rule.remove.summary"] = "按位置、文本或字符类型删除",
         ["rule.case.name"] = "大小写",
@@ -122,7 +147,7 @@ internal static class StringCatalog
         ["rule.extension.name"] = "扩展名",
         ["rule.extension.summary"] = "修改或统一扩展名",
         ["rule.number.name"] = "编号",
-        ["rule.number.summary"] = "加上连续序号",
+        ["rule.number.summary"] = "用连续序号命名，也可只加在原名旁边",
         ["rule.cleanup.name"] = "整理清洗",
         ["rule.cleanup.summary"] = "去空格、去符号、限制长度",
 
@@ -136,7 +161,8 @@ internal static class StringCatalog
         ["rule.replace.ignoreCase"] = "忽略大小写",
         ["rule.replace.firstOnly"] = "只替换第一处",
         ["rule.replace.regexHint"] = "可用 $1 $2 引用捕获组",
-        ["rule.insert.text"] = "要插入的文本",
+        ["rule.replacesName"] = "替换整个名字",
+        ["rule.insert.text"] = "文本",
         ["rule.insert.position"] = "位置",
         ["rule.insert.index"] = "第几个字符",
         ["rule.remove.mode"] = "方式",
@@ -147,6 +173,7 @@ internal static class StringCatalog
         ["rule.case.mode"] = "转换为",
         ["rule.extension.mode"] = "操作",
         ["rule.extension.newExtension"] = "新扩展名",
+        ["rule.number.prefix"] = "编号前缀",
         ["rule.number.position"] = "位置",
         ["rule.number.separator"] = "分隔符",
         ["rule.number.start"] = "起始值",
@@ -168,7 +195,7 @@ internal static class StringCatalog
         ["rule.pattern.unknownToken"] = "模板里有无法识别的变量，它会原样出现在文件名中。",
         ["rule.replace.emptyFind"] = "请填写要查找的内容。",
         ["rule.replace.badRegex"] = "正则表达式还不完整或有语法错误。",
-        ["rule.insert.emptyText"] = "请填写要插入的文本。",
+        ["rule.insert.emptyText"] = "请填写文本。",
         ["rule.insert.negativeIndex"] = "位置不能是负数。",
         ["rule.remove.emptyText"] = "请填写要删除的文本。",
         ["rule.remove.negativePosition"] = "起始位置不能是负数。",
@@ -336,12 +363,15 @@ internal static class StringCatalog
         ["settings.backdrop.unavailable"] = "当前系统版本不支持窗口材质，这里的选择会在系统更新后生效。",
         ["settings.language"] = "语言",
         ["settings.language.hint"] = "切换后立即生效，不用重启。",
-        ["settings.navigationExpanded"] = "启动时展开侧边导航",
         ["settings.section.defaults"] = "默认行为",
         ["settings.checkUpdates"] = "启动时检查更新",
         ["settings.checkUpdates.hint"] = "仅访问 GitHub Releases；不会上传文件名、历史记录或使用数据。",
+        ["settings.minimizeToTray"] = "最小化到通知区域",
+        ["settings.minimizeToTray.hint"] = "点最小化后窗口收进右下角的托盘图标，单击图标即可回来。Windows 11 默认把新图标折叠在「^」里，可以把它拖到任务栏上常显。",
         ["settings.confirmBeforeRun"] = "开始重命名前先确认",
         ["settings.confirmBeforeRun.hint"] = "关掉之后点「开始重命名」会直接执行，但仍然可以撤销。",
+        ["settings.folderPicker"] = "选择文件夹时打开",
+        ["settings.folderPicker.hint"] = "「Windows 对话框」就是系统自带的那个，有你固定的位置和地址栏，用起来最熟；但它只列文件夹，所以满是照片的文件夹在里面看着是空的，还会显示「没有与搜索条件匹配的项」。「应用内浏览器」会把文件夹里的文件一并列出来，选之前就能确认没找错地方。",
         ["settings.recursive"] = "默认包含子文件夹",
         ["settings.recursive.hint"] = "添加文件夹时，是否连同里面的所有层级一起扫描。",
         ["settings.scanTarget"] = "默认扫描对象",
@@ -445,7 +475,9 @@ internal static class StringCatalog
         ["enum.AppTheme.Dark"] = "深色",
         ["enum.WindowBackdrop.None"] = "纯色",
         ["enum.WindowBackdrop.Mica"] = "云母",
-        ["enum.WindowBackdrop.Acrylic"] = "亚克力"
+        ["enum.WindowBackdrop.Acrylic"] = "亚克力",
+        ["enum.FolderPickerStyle.System"] = "Windows 对话框",
+        ["enum.FolderPickerStyle.InApp"] = "应用内浏览器"
     };
 
     private static Dictionary<string, string> English => new(StringComparer.Ordinal)
@@ -458,15 +490,15 @@ internal static class StringCatalog
         ["nav.history"] = "History",
         ["nav.settings"] = "Settings",
         ["nav.about"] = "About",
-        ["nav.toggle"] = "Expand or collapse navigation",
         ["window.minimize"] = "Minimize",
-        ["window.maximize"] = "Maximize",
-        ["window.restore"] = "Restore down",
         ["window.close"] = "Close",
+        ["tray.show"] = "Show main window",
+        ["tray.exit"] = "Exit",
 
         // ---- source list ----
         ["source.title"] = "Files",
         ["source.addFolder"] = "Add folder",
+        ["source.addFolder.hint"] = "Pick more than one if you like. To see the files inside a folder before you choose it, switch the folder picker to the in-app browser in Settings.",
         ["source.addFiles"] = "Add files",
         ["source.clear"] = "Clear",
         ["source.remove"] = "Remove from list",
@@ -481,6 +513,22 @@ internal static class StringCatalog
         ["source.count"] = "{0} selected",
         ["source.dropHint"] = "Release to add",
         ["source.noneAdded"] = "Nothing in those locations matched the filter",
+
+        // ---- folder picker ----
+        ["folderPicker.title"] = "Choose folder",
+        ["folderPicker.places"] = "Places",
+        ["folderPicker.folders"] = "Subfolders",
+        ["folderPicker.files"] = "Files",
+        ["folderPicker.filesCount"] = "Files ({0})",
+        ["folderPicker.noFiles"] = "No files in this folder",
+        ["folderPicker.noFolders"] = "No subfolders",
+        ["folderPicker.location"] = "Location",
+        ["folderPicker.up"] = "Up one level",
+        ["folderPicker.refresh"] = "Refresh",
+        ["folderPicker.thisPc"] = "This PC",
+        ["folderPicker.chooseCurrent"] = "Choose this folder",
+        ["folderPicker.chooseOne"] = "Choose selected folder",
+        ["folderPicker.chooseMany"] = "Choose these {0} folders",
 
         // ---- rules ----
         ["rules.title"] = "Rules",
@@ -499,8 +547,8 @@ internal static class StringCatalog
         ["rule.pattern.summary"] = "Build a new name out of variables",
         ["rule.replace.name"] = "Find and replace",
         ["rule.replace.summary"] = "Swap one piece of text for another",
-        ["rule.insert.name"] = "Insert text",
-        ["rule.insert.summary"] = "Add text at the start, end or a position",
+        ["rule.insert.name"] = "Text",
+        ["rule.insert.summary"] = "Name items with text, or add it beside the old name",
         ["rule.remove.name"] = "Remove characters",
         ["rule.remove.summary"] = "By position, by text or by character type",
         ["rule.case.name"] = "Change case",
@@ -508,7 +556,7 @@ internal static class StringCatalog
         ["rule.extension.name"] = "Extension",
         ["rule.extension.summary"] = "Change or normalise the extension",
         ["rule.number.name"] = "Numbering",
-        ["rule.number.summary"] = "Add a running counter",
+        ["rule.number.summary"] = "Number items, or add a counter beside the old name",
         ["rule.cleanup.name"] = "Tidy up",
         ["rule.cleanup.summary"] = "Trim spaces, drop symbols, cap the length",
 
@@ -522,7 +570,8 @@ internal static class StringCatalog
         ["rule.replace.ignoreCase"] = "Ignore case",
         ["rule.replace.firstOnly"] = "Only the first match",
         ["rule.replace.regexHint"] = "Use $1, $2 to reference capture groups",
-        ["rule.insert.text"] = "Text to insert",
+        ["rule.replacesName"] = "Replace the whole name",
+        ["rule.insert.text"] = "Text",
         ["rule.insert.position"] = "Position",
         ["rule.insert.index"] = "Character number",
         ["rule.remove.mode"] = "Remove",
@@ -533,6 +582,7 @@ internal static class StringCatalog
         ["rule.case.mode"] = "Change to",
         ["rule.extension.mode"] = "Action",
         ["rule.extension.newExtension"] = "New extension",
+        ["rule.number.prefix"] = "Prefix",
         ["rule.number.position"] = "Position",
         ["rule.number.separator"] = "Separator",
         ["rule.number.start"] = "Start at",
@@ -554,7 +604,7 @@ internal static class StringCatalog
         ["rule.pattern.unknownToken"] = "The pattern has a variable we do not recognise; it will appear as-is in the name.",
         ["rule.replace.emptyFind"] = "Enter the text to look for.",
         ["rule.replace.badRegex"] = "The regular expression is incomplete or has a syntax error.",
-        ["rule.insert.emptyText"] = "Enter the text to insert.",
+        ["rule.insert.emptyText"] = "Enter the text to use.",
         ["rule.insert.negativeIndex"] = "The position cannot be negative.",
         ["rule.remove.emptyText"] = "Enter the text to remove.",
         ["rule.remove.negativePosition"] = "The start position cannot be negative.",
@@ -722,12 +772,15 @@ internal static class StringCatalog
         ["settings.backdrop.unavailable"] = "This build of Windows cannot draw window materials. The choice is saved and applies once you upgrade.",
         ["settings.language"] = "Language",
         ["settings.language.hint"] = "Applies immediately, no restart needed.",
-        ["settings.navigationExpanded"] = "Start with the sidebar expanded",
         ["settings.section.defaults"] = "Defaults",
         ["settings.checkUpdates"] = "Check for updates at startup",
         ["settings.checkUpdates.hint"] = "Only GitHub Releases is contacted; file names, history, and usage data are never uploaded.",
+        ["settings.minimizeToTray"] = "Minimize to the notification area",
+        ["settings.minimizeToTray.hint"] = "Minimizing tucks the window behind a tray icon; click it to come back. Windows 11 hides new icons in the \"^\" flyout — drag it onto the taskbar to keep it visible.",
         ["settings.confirmBeforeRun"] = "Ask before renaming",
         ["settings.confirmBeforeRun.hint"] = "With this off, Rename runs immediately — you can still undo it.",
+        ["settings.folderPicker"] = "Choose folders with",
+        ["settings.folderPicker.hint"] = "The Windows dialog is the system one, with your pinned places and address bar, and it is the one you already know. It lists folders only, though, so a folder full of photos looks empty in it and says \"no items match your search\". The in-app browser lists the files as well, so you can confirm you are in the right folder before you pick it.",
         ["settings.recursive"] = "Include subfolders by default",
         ["settings.recursive.hint"] = "Whether adding a folder also scans everything nested inside it.",
         ["settings.scanTarget"] = "Scan for",
@@ -831,6 +884,8 @@ internal static class StringCatalog
         ["enum.AppTheme.Dark"] = "Dark",
         ["enum.WindowBackdrop.None"] = "Solid",
         ["enum.WindowBackdrop.Mica"] = "Mica",
-        ["enum.WindowBackdrop.Acrylic"] = "Acrylic"
+        ["enum.WindowBackdrop.Acrylic"] = "Acrylic",
+        ["enum.FolderPickerStyle.System"] = "Windows dialog",
+        ["enum.FolderPickerStyle.InApp"] = "In-app browser"
     };
 }

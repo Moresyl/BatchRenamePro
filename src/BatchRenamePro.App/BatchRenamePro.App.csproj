@@ -45,6 +45,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- The string tables are internal and should stay that way; the tests that check the two
+         languages agree with each other need to read them all the same. -->
+    <InternalsVisibleTo Include="BatchRenamePro.App.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
@@ -53,6 +59,11 @@
   <ItemGroup>
     <!-- The brand mark, shown on the About page and in the title bar. -->
     <Resource Include="Assets\app-256.png" />
+
+    <!-- ApplicationIcon above stamps this onto the executable, which is what Explorer reads. The
+         notification area needs it a second way: as a resource the process can open and pick a
+         frame out of, since the file on disk is not reachable from a single-file publish. -->
+    <Resource Include="Assets\app.ico" />
   </ItemGroup>
 
 </Project>

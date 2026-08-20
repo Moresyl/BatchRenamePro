@@ -100,7 +100,7 @@ public sealed class RemoveRule : RenameRuleBase
     }
 
     /// <inheritdoc />
-    public override NameParts Apply(NameParts input, RenameContext context) => _scope.Transform(input, Remove);
+    public override NameParts Apply(NameParts input, RenameContext context) => _scope.Transform(input, context, Remove);
 
     /// <inheritdoc />
     public override IReadOnlyList<RuleDiagnostic> Validate()

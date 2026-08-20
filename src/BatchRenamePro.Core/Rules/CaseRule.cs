@@ -57,7 +57,7 @@ public sealed class CaseRule : RenameRuleBase
     }
 
     /// <inheritdoc />
-    public override NameParts Apply(NameParts input, RenameContext context) => _scope.Transform(input, Convert);
+    public override NameParts Apply(NameParts input, RenameContext context) => _scope.Transform(input, context, Convert);
 
     /// <inheritdoc />
     public override IRenameRule Clone() => CopyBaseTo(new CaseRule { _mode = _mode, _scope = _scope });

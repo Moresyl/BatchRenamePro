@@ -1,5 +1,7 @@
 using System.IO;
+using System.Windows;
 using BatchRenamePro.App.Localization;
+using BatchRenamePro.App.Views;
 using Microsoft.Win32;
 
 namespace BatchRenamePro.App.Services;
@@ -29,8 +31,8 @@ public interface IDialogService
 
     /// <summary>Opens the folder picker.</summary>
     /// <param name="startingFolder">Where the picker opens.</param>
-    /// <returns>The chosen folder, or <see langword="null"/> if cancelled.</returns>
-    string? PickFolder(string? startingFolder);
+    /// <returns>The chosen folders, empty if cancelled.</returns>
+    IReadOnlyList<string> PickFolders(string? startingFolder);
 
     /// <summary>Opens the multi-select file picker.</summary>
     /// <param name="startingFolder">Where the picker opens.</param>
@@ -51,14 +53,20 @@ public sealed class DialogService : IDialogService
 {
     private readonly DialogHost _host;
     private readonly ILocalizer _localizer;
+    private readonly IThemeService _theme;
+    private readonly ISettingsService _settings;
 
     /// <summary>Creates the service.</summary>
     /// <param name="host">Where in-window dialogs are shown.</param>
     /// <param name="localizer">Supplies the button labels.</param>
-    public DialogService(DialogHost host, ILocalizer localizer)
+    /// <param name="theme">Tells the folder picker which way round to draw its frame.</param>
+    /// <param name="settings">Says which of the two folder pickers to open.</param>
+    public DialogService(DialogHost host, ILocalizer localizer, IThemeService theme, ISettingsService settings)
     {
         _host = host;
         _localizer = localizer;
+        _theme = theme;
+        _settings = settings;
     }
 
     /// <inheritdoc />
@@ -97,17 +105,24 @@ public sealed class DialogService : IDialogService
         });
 
     /// <inheritdoc />
-    public string? PickFolder(string? startingFolder)
-    {
-        var dialog = new OpenFolderDialog
-        {
-            Title = _localizer["source.addFolder"],
-            Multiselect = false,
-            InitialDirectory = Existing(startingFolder)
-        };
-
-        return dialog.ShowDialog() is true ? dialog.FolderName : null;
-    }
+    /// <remarks>
+    /// Two pickers, chosen by <see cref="AppSettings.FolderPicker" />, and the shell's is the default.
+    /// It is the dialog every other application opens: the user's own pinned places are down the side,
+    /// the address bar takes a pasted path, and none of it has to be learned. What it will not do is
+    /// list files — <c>FOS_PICKFOLDERS</c> shows folders and nothing else — so standing in a folder of
+    /// photos it presents an empty pane and Explorer's stock "no items match your search", which reads
+    /// as "this folder is empty" to anyone who has not been told otherwise.
+    /// <para>
+    /// That is what <see cref="FolderPickerWindow" /> is for, and it is one setting away. Which of the
+    /// two costs less is a question about the person, not about the code: familiarity is worth more to
+    /// someone who picks a folder they already know, and the file list is worth more to someone who is
+    /// looking for the right one.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<string> PickFolders(string? startingFolder) =>
+        _settings.Current.FolderPicker is FolderPickerStyle.InApp
+            ? PickFoldersInApp(startingFolder)
+            : PickFoldersWithShell(startingFolder);
 
     /// <inheritdoc />
     public IReadOnlyList<string> PickFiles(string? startingFolder)
@@ -135,6 +150,33 @@ public sealed class DialogService : IDialogService
     {
         var dialog = new SaveFileDialog { Filter = filter, FileName = suggestedName, OverwritePrompt = true };
         return dialog.ShowDialog() is true ? dialog.FileName : null;
+    }
+
+    // Returns the array rather than the interface because that is what the dialog already hands
+    // back, and wrapping it only to widen it is a copy the caller does not need.
+    private string[] PickFoldersWithShell(string? startingFolder)
+    {
+        var dialog = new OpenFolderDialog
+        {
+            Title = _localizer["source.addFolder"],
+            Multiselect = true,
+            InitialDirectory = Existing(startingFolder)
+        };
+
+        return dialog.ShowDialog() is true ? dialog.FolderNames : [];
+    }
+
+    private IReadOnlyList<string> PickFoldersInApp(string? startingFolder)
+    {
+        var picker = new FolderPickerWindow(_localizer, Existing(startingFolder), _theme);
+
+        // An owner that is not on screen yet cannot be centred on, and assigning one throws.
+        if (Application.Current?.MainWindow is { IsLoaded: true } owner && !ReferenceEquals(owner, picker))
+            picker.Owner = owner;
+        else
+            picker.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
+        return picker.ShowDialog() is true ? picker.Selection : [];
     }
 
     // A stale InitialDirectory is ignored by the shell dialog, but checking keeps the picker

@@ -11,18 +11,18 @@
         owning one: saving a preset here and saving one from the rules panel are the same act.
     -->
 
-    <Border Margin="0,0,16,16" Style="{StaticResource Panel}">
+    <Border Margin="10,2,10,10" Style="{StaticResource Panel}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Grid Margin="20,18,20,12">
+            <Grid Margin="12,10,12,8">
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock Style="{StaticResource Text.Title}" Text="{loc:T presets.title}" />
                     <TextBlock
-                        Margin="0,4,0,0"
+                        Margin="0,2,0,0"
                         Style="{StaticResource Text.Secondary}"
                         Text="{loc:T presets.subtitle}" />
                 </StackPanel>
@@ -36,7 +36,7 @@
                         Content="{loc:T presets.import}"
                         Tag="{StaticResource Icon.Import}" />
                     <Button
-                        Margin="8,0,0,0"
+                        Margin="6,0,0,0"
                         Command="{Binding SavePresetCommand}"
                         Content="{loc:T presets.saveCurrent}"
                         Style="{StaticResource Button.Accent}"
@@ -46,7 +46,7 @@
 
             <ScrollViewer
                 Grid.Row="1"
-                Padding="20,0,14,20"
+                Padding="12,0,8,12"
                 VerticalScrollBarVisibility="Auto">
                 <Grid>
                     <ItemsControl ItemsSource="{Binding Presets}">
@@ -63,8 +63,8 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type vm:PresetItem}">
                                 <Border
-                                    Margin="0,0,0,10"
-                                    Padding="16,14"
+                                    Margin="0,0,0,6"
+                                    Padding="10,8"
                                     Style="{StaticResource Card.Raised}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -74,15 +74,15 @@
                                         </Grid.ColumnDefinitions>
 
                                         <Border
-                                            Width="38"
-                                            Height="38"
-                                            Margin="0,0,14,0"
+                                            Width="28"
+                                            Height="28"
+                                            Margin="0,0,9,0"
                                             VerticalAlignment="Top"
                                             Background="{DynamicResource Brush.Accent.Subtle}"
                                             CornerRadius="{StaticResource Radius.Medium}">
                                             <Path
-                                                Width="18"
-                                                Height="18"
+                                                Width="15"
+                                                Height="15"
                                                 Data="{StaticResource Icon.Preset}"
                                                 Style="{StaticResource Icon.Accent}"
                                                 HorizontalAlignment="Center" />
@@ -95,20 +95,20 @@
                                                     Style="{StaticResource Text.BodyStrong}"
                                                     Text="{Binding Name}" />
                                                 <Border
-                                                    Margin="8,0,0,0"
+                                                    Margin="6,0,0,0"
                                                     VerticalAlignment="Center"
                                                     Style="{StaticResource Chip.Info}"
                                                     Visibility="{Binding IsBuiltIn, Converter={StaticResource BoolToVisibility}}">
                                                     <TextBlock Style="{StaticResource Text.Caption}" Text="{loc:T presets.builtIn}" />
                                                 </Border>
-                                                <Border Margin="6,0,0,0" VerticalAlignment="Center" Style="{StaticResource Chip}">
+                                                <Border Margin="4,0,0,0" VerticalAlignment="Center" Style="{StaticResource Chip}">
                                                     <TextBlock
                                                         Style="{StaticResource Text.Caption}"
                                                         Text="{Binding RuleCount, Converter={StaticResource Format}, ConverterParameter=presets.ruleCount}" />
                                                 </Border>
                                             </StackPanel>
                                             <TextBlock
-                                                Margin="0,5,0,0"
+                                                Margin="0,3,0,0"
                                                 Style="{StaticResource Text.Secondary}"
                                                 Text="{Binding Description}"
                                                 TextTrimming="CharacterEllipsis" />
@@ -124,7 +124,7 @@
                                                 Content="{loc:T presets.apply}"
                                                 Tag="{StaticResource Icon.Play}" />
                                             <Button
-                                                Margin="6,0,0,0"
+                                                Margin="4,0,0,0"
                                                 Command="{Binding DataContext.ExportPresetCommand, RelativeSource={RelativeSource AncestorType=views:PresetsPage}}"
                                                 CommandParameter="{Binding}"
                                                 Style="{StaticResource Button.Icon}"
@@ -146,13 +146,13 @@
                     </ItemsControl>
 
                     <StackPanel
-                        Margin="0,70,0,0"
+                        Margin="0,44,0,0"
                         VerticalAlignment="Top"
                         Visibility="{Binding Presets.Count, Converter={StaticResource CountToVisibilityInverse}}">
                         <Path
-                            Width="48"
-                            Height="48"
-                            Margin="0,0,0,18"
+                            Width="36"
+                            Height="36"
+                            Margin="0,0,0,12"
                             Data="{StaticResource Icon.Preset}"
                             Fill="{DynamicResource Brush.Text.Disabled}"
                             Style="{StaticResource Icon}"
@@ -162,7 +162,7 @@
                             Style="{StaticResource Text.Subtitle}"
                             Text="{loc:T presets.empty.title}" />
                         <TextBlock
-                            Margin="0,8,0,0"
+                            Margin="0,5,0,0"
                             HorizontalAlignment="Center"
                             Style="{StaticResource Text.Secondary}"
                             Text="{loc:T presets.empty.hint}" />

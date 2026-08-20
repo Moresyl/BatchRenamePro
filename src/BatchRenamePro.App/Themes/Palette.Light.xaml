@@ -45,7 +45,7 @@
     <SolidColorBrush x:Key="Brush.Text.Tertiary" Color="#72000000" />
     <SolidColorBrush x:Key="Brush.Text.Disabled" Color="#5C000000" />
     <SolidColorBrush x:Key="Brush.Text.OnAccent" Color="#FFFFFFFF" />
-    <SolidColorBrush x:Key="Brush.Text.Accent" Color="#FF3A4FD8" />
+    <SolidColorBrush x:Key="Brush.Text.Accent" Color="#FF005FB8" />
 
     <!-- ==== Strokes ========================================================================= -->
 
@@ -62,27 +62,24 @@
     -->
     <SolidColorBrush x:Key="Brush.Stroke.ControlBottom" Color="#29000000" />
 
-    <!-- ==== Accent ========================================================================== -->
+    <!--
+        ==== Accent ==========================================================================
 
-    <Color x:Key="Color.Accent.Start">#FF4F6EF7</Color>
-    <Color x:Key="Color.Accent.End">#FF9756F6</Color>
+        One blue, no gradient. A two-stop brand gradient dates an interface faster than anything
+        else on screen, and it fights the Mica behind the window: the same button reads as two
+        different colours depending on how wide it happens to be. This is the Windows 11 accent
+        blue, dark enough that white sits on it at 6.3:1 — a gradient cannot promise that,
+        because the contrast changes along its length.
+    -->
 
-    <SolidColorBrush x:Key="Brush.Accent.Default" Color="#FF4F6EF7" />
-    <SolidColorBrush x:Key="Brush.Accent.Hover" Color="#FF4361E8" />
-    <SolidColorBrush x:Key="Brush.Accent.Pressed" Color="#FF3B55D0" />
-    <SolidColorBrush x:Key="Brush.Accent.Disabled" Color="#FFBFC6D9" />
-    <SolidColorBrush x:Key="Brush.Accent.Subtle" Color="#1A4F6EF7" />
-    <SolidColorBrush x:Key="Brush.Accent.SubtleHover" Color="#294F6EF7" />
+    <Color x:Key="Color.Accent">#FF005FB8</Color>
 
-    <LinearGradientBrush x:Key="Brush.Accent.Gradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Offset="0" Color="{StaticResource Color.Accent.Start}" />
-        <GradientStop Offset="1" Color="{StaticResource Color.Accent.End}" />
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="Brush.Accent.GradientHover" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Offset="0" Color="#FF6280FF" />
-        <GradientStop Offset="1" Color="#FFA66DFF" />
-    </LinearGradientBrush>
+    <SolidColorBrush x:Key="Brush.Accent.Default" Color="{StaticResource Color.Accent}" />
+    <SolidColorBrush x:Key="Brush.Accent.Hover" Color="#FF00559F" />
+    <SolidColorBrush x:Key="Brush.Accent.Pressed" Color="#FF004B8C" />
+    <SolidColorBrush x:Key="Brush.Accent.Disabled" Color="#FFBFC9D6" />
+    <SolidColorBrush x:Key="Brush.Accent.Subtle" Color="#1A005FB8" />
+    <SolidColorBrush x:Key="Brush.Accent.SubtleHover" Color="#29005FB8" />
 
     <!-- ==== Status ========================================================================== -->
 
@@ -99,9 +96,9 @@
     <SolidColorBrush x:Key="Brush.Danger.Stroke" Color="#40C42B1C" />
     <SolidColorBrush x:Key="Brush.Danger.Hover" Color="#FFB2271A" />
 
-    <SolidColorBrush x:Key="Brush.Info" Color="#FF4F6EF7" />
-    <SolidColorBrush x:Key="Brush.Info.Bg" Color="#FFEFF2FE" />
-    <SolidColorBrush x:Key="Brush.Info.Stroke" Color="#404F6EF7" />
+    <SolidColorBrush x:Key="Brush.Info" Color="#FF005FB8" />
+    <SolidColorBrush x:Key="Brush.Info.Bg" Color="#FFEFF5FC" />
+    <SolidColorBrush x:Key="Brush.Info.Stroke" Color="#40005FB8" />
 
     <!-- ==== Preview diff ==================================================================== -->
 

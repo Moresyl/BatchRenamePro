@@ -21,34 +21,13 @@
     <!-- Declared here rather than shared, for the same sibling-dictionary reason as above: a
          Converter cannot be a DynamicResource, so this dictionary needs its own instance. -->
     <convert:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+    <convert:BoolToVisibilityConverter x:Key="BoolToVisibilityInverse" Invert="True" />
 
-    <!-- ==== Field scaffolding =============================================================== -->
-
-    <Style x:Key="Field" TargetType="StackPanel">
-        <Setter Property="Margin" Value="0,0,0,12" />
-    </Style>
-
-    <Style x:Key="Field.Label" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="{DynamicResource Font.Family}" />
-        <Setter Property="FontSize" Value="12" />
-        <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}" />
-        <Setter Property="Margin" Value="2,0,0,5" />
-    </Style>
-
-    <Style x:Key="Field.Check" TargetType="CheckBox">
-        <Setter Property="Margin" Value="0,0,0,10" />
-    </Style>
-
-    <Style x:Key="Field.Number" TargetType="TextBox">
-        <Setter Property="Width" Value="76" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-    </Style>
-
-    <!-- Every enum picker in this file: value in, localized label out. -->
-    <Style x:Key="Field.Enum" TargetType="ComboBox">
-        <Setter Property="DisplayMemberPath" Value="Text" />
-        <Setter Property="SelectedValuePath" Value="Value" />
-    </Style>
+    <!--
+        The Field / Field.Label / Field.Check / Field.Number / Field.Enum styles this file leans on
+        are declared in Controls.xaml, next to the implicit styles they derive from. See the note
+        there: BasedOn takes a StaticResource only, which from here would resolve to nothing.
+    -->
 
     <!-- ==== Shared blocks =================================================================== -->
 
@@ -89,7 +68,7 @@
             </StackPanel>
 
             <WrapPanel>
-                <StackPanel Margin="0,0,12,12">
+                <StackPanel Margin="0,0,8,8">
                     <TextBlock
                         x:Name="LabelNumberStart"
                         Style="{DynamicResource Field.Label}"
@@ -99,7 +78,7 @@
                         Style="{DynamicResource Field.Number}"
                         Text="{Binding Start}" />
                 </StackPanel>
-                <StackPanel Margin="0,0,12,12">
+                <StackPanel Margin="0,0,8,8">
                     <TextBlock
                         x:Name="LabelNumberStep"
                         Style="{DynamicResource Field.Label}"
@@ -109,7 +88,7 @@
                         Style="{DynamicResource Field.Number}"
                         Text="{Binding Step}" />
                 </StackPanel>
-                <StackPanel Margin="0,0,12,12">
+                <StackPanel Margin="0,0,8,8">
                     <TextBlock
                         x:Name="LabelNumberPadding"
                         Style="{DynamicResource Field.Label}"
@@ -119,7 +98,7 @@
                         Style="{DynamicResource Field.Number}"
                         Text="{Binding Padding}" />
                 </StackPanel>
-                <StackPanel Margin="0,0,0,12">
+                <StackPanel Margin="0,0,0,8">
                     <TextBlock
                         x:Name="LabelNumberGroupSize"
                         Style="{DynamicResource Field.Label}"
@@ -193,7 +172,7 @@
                 Style="{DynamicResource Field.Check}" />
 
             <TextBlock
-                Margin="0,0,0,12"
+                Margin="0,0,0,8"
                 Style="{DynamicResource Text.Caption}"
                 Text="{loc:T rule.replace.regexHint}"
                 TextWrapping="Wrap"
@@ -205,44 +184,70 @@
 
     <!-- ==== Number ========================================================================== -->
 
+    <!--
+        The two halves below are alternatives, not a checkbox with some fields greyed out. Position
+        and the separator only describe something while the old name is still there to sit next to,
+        and the same text box is a prefix in one mode and a separator in the other — so each mode
+        gets the label that is true in it, and the mode that is off takes no room on screen.
+    -->
     <DataTemplate DataType="{x:Type rules:NumberRule}">
         <StackPanel>
-            <StackPanel Style="{DynamicResource Field}">
+            <CheckBox
+                Content="{loc:T rule.replacesName}"
+                IsChecked="{Binding ReplacesName}"
+                Style="{DynamicResource Field.Check}" />
+
+            <StackPanel
+                Style="{DynamicResource Field}"
+                Visibility="{Binding ReplacesName, Converter={StaticResource BoolToVisibility}}">
                 <TextBlock
-                    x:Name="LabelNumberPosition"
+                    x:Name="LabelNumberPrefix"
                     Style="{DynamicResource Field.Label}"
-                    Text="{loc:T rule.number.position}" />
-                <ComboBox
-                    AutomationProperties.LabeledBy="{Binding ElementName=LabelNumberPosition}"
-                    ItemsSource="{loc:EnumSource {x:Type rules:InsertPosition}}"
-                    SelectedValue="{Binding Position}"
-                    Style="{DynamicResource Field.Enum}" />
+                    Text="{loc:T rule.number.prefix}" />
+                <TextBox
+                    AutomationProperties.LabeledBy="{Binding ElementName=LabelNumberPrefix}"
+                    Style="{DynamicResource TextBox.Mono}"
+                    Text="{Binding Separator, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
 
-            <WrapPanel>
-                <StackPanel Margin="0,0,12,12">
+            <StackPanel Visibility="{Binding ReplacesName, Converter={StaticResource BoolToVisibilityInverse}}">
+                <StackPanel Style="{DynamicResource Field}">
                     <TextBlock
-                        x:Name="LabelInsertIndex"
+                        x:Name="LabelNumberPosition"
                         Style="{DynamicResource Field.Label}"
-                        Text="{loc:T rule.insert.index}" />
-                    <TextBox
-                        AutomationProperties.LabeledBy="{Binding ElementName=LabelInsertIndex}"
-                        Style="{DynamicResource Field.Number}"
-                        Text="{Binding Index}" />
+                        Text="{loc:T rule.number.position}" />
+                    <ComboBox
+                        AutomationProperties.LabeledBy="{Binding ElementName=LabelNumberPosition}"
+                        ItemsSource="{loc:EnumSource {x:Type rules:InsertPosition}}"
+                        SelectedValue="{Binding Position}"
+                        Style="{DynamicResource Field.Enum}" />
                 </StackPanel>
-                <StackPanel Margin="0,0,0,12">
-                    <TextBlock
-                        x:Name="LabelNumberSeparator"
-                        Style="{DynamicResource Field.Label}"
-                        Text="{loc:T rule.number.separator}" />
-                    <TextBox
-                        AutomationProperties.LabeledBy="{Binding ElementName=LabelNumberSeparator}"
-                        Width="100"
-                        HorizontalContentAlignment="Center"
-                        Style="{DynamicResource TextBox.Mono}"
-                        Text="{Binding Separator, UpdateSourceTrigger=PropertyChanged}" />
-                </StackPanel>
-            </WrapPanel>
+
+                <WrapPanel>
+                    <StackPanel Margin="0,0,8,8">
+                        <TextBlock
+                            x:Name="LabelNumberIndex"
+                            Style="{DynamicResource Field.Label}"
+                            Text="{loc:T rule.insert.index}" />
+                        <TextBox
+                            AutomationProperties.LabeledBy="{Binding ElementName=LabelNumberIndex}"
+                            Style="{DynamicResource Field.Number}"
+                            Text="{Binding Index}" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,8">
+                        <TextBlock
+                            x:Name="LabelNumberSeparator"
+                            Style="{DynamicResource Field.Label}"
+                            Text="{loc:T rule.number.separator}" />
+                        <TextBox
+                            AutomationProperties.LabeledBy="{Binding ElementName=LabelNumberSeparator}"
+                            Width="88"
+                            HorizontalContentAlignment="Center"
+                            Style="{DynamicResource TextBox.Mono}"
+                            Text="{Binding Separator, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </WrapPanel>
+            </StackPanel>
 
             <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource Editor.Scope}" />
             <ContentControl Content="{Binding Sequence}" ContentTemplate="{DynamicResource Editor.Sequence}" />
@@ -264,27 +269,36 @@
                     Pattern="{Binding Text}" />
             </StackPanel>
 
-            <StackPanel Style="{DynamicResource Field}">
-                <TextBlock
-                    x:Name="LabelInsertPosition"
-                    Style="{DynamicResource Field.Label}"
-                    Text="{loc:T rule.insert.position}" />
-                <ComboBox
-                    AutomationProperties.LabeledBy="{Binding ElementName=LabelInsertPosition}"
-                    ItemsSource="{loc:EnumSource {x:Type rules:InsertPosition}}"
-                    SelectedValue="{Binding Position}"
-                    Style="{DynamicResource Field.Enum}" />
-            </StackPanel>
+            <CheckBox
+                Content="{loc:T rule.replacesName}"
+                IsChecked="{Binding ReplacesName}"
+                Style="{DynamicResource Field.Check}" />
 
-            <StackPanel Style="{DynamicResource Field}">
-                <TextBlock
-                    x:Name="LabelInsertIndex"
-                    Style="{DynamicResource Field.Label}"
-                    Text="{loc:T rule.insert.index}" />
-                <TextBox
-                    AutomationProperties.LabeledBy="{Binding ElementName=LabelInsertIndex}"
-                    Style="{DynamicResource Field.Number}"
-                    Text="{Binding Index}" />
+            <!-- Nothing to position the text against once it is the name, so this half goes away
+                 with the mode it belongs to. {name} is how the text reaches the old name instead. -->
+            <StackPanel Visibility="{Binding ReplacesName, Converter={StaticResource BoolToVisibilityInverse}}">
+                <StackPanel Style="{DynamicResource Field}">
+                    <TextBlock
+                        x:Name="LabelInsertPosition"
+                        Style="{DynamicResource Field.Label}"
+                        Text="{loc:T rule.insert.position}" />
+                    <ComboBox
+                        AutomationProperties.LabeledBy="{Binding ElementName=LabelInsertPosition}"
+                        ItemsSource="{loc:EnumSource {x:Type rules:InsertPosition}}"
+                        SelectedValue="{Binding Position}"
+                        Style="{DynamicResource Field.Enum}" />
+                </StackPanel>
+
+                <StackPanel Style="{DynamicResource Field}">
+                    <TextBlock
+                        x:Name="LabelInsertIndex"
+                        Style="{DynamicResource Field.Label}"
+                        Text="{loc:T rule.insert.index}" />
+                    <TextBox
+                        AutomationProperties.LabeledBy="{Binding ElementName=LabelInsertIndex}"
+                        Style="{DynamicResource Field.Number}"
+                        Text="{Binding Index}" />
+                </StackPanel>
             </StackPanel>
 
             <ContentControl Content="{Binding}" ContentTemplate="{DynamicResource Editor.Scope}" />
@@ -309,7 +323,7 @@
             </StackPanel>
 
             <WrapPanel>
-                <StackPanel Margin="0,0,12,12">
+                <StackPanel Margin="0,0,8,8">
                     <TextBlock
                         x:Name="LabelRemoveCount"
                         Style="{DynamicResource Field.Label}"
@@ -319,7 +333,7 @@
                         Style="{DynamicResource Field.Number}"
                         Text="{Binding Count}" />
                 </StackPanel>
-                <StackPanel Margin="0,0,0,12">
+                <StackPanel Margin="0,0,0,8">
                     <TextBlock
                         x:Name="LabelRemovePosition"
                         Style="{DynamicResource Field.Label}"
@@ -428,15 +442,15 @@
                 IsChecked="{Binding RemoveDiacritics}"
                 Style="{DynamicResource Field.Check}" />
 
-            <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+            <StackPanel Margin="0,0,0,6" Orientation="Horizontal">
                 <CheckBox
                     x:Name="CheckReplaceSpaces"
-                    MinWidth="150"
+                    MinWidth="140"
                     Content="{loc:T rule.cleanup.replaceSpaces}"
                     IsChecked="{Binding ReplaceSpaces}" />
                 <TextBox
-                    Width="76"
-                    Margin="10,0,0,0"
+                    Width="64"
+                    Margin="8,0,0,0"
                     HorizontalContentAlignment="Center"
                     AutomationProperties.LabeledBy="{Binding ElementName=CheckReplaceSpaces}"
                     IsEnabled="{Binding ReplaceSpaces}"
@@ -444,15 +458,15 @@
                     Text="{Binding SpaceReplacement, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
 
-            <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+            <StackPanel Margin="0,0,0,6" Orientation="Horizontal">
                 <CheckBox
                     x:Name="CheckStripInvalid"
-                    MinWidth="150"
+                    MinWidth="140"
                     Content="{loc:T rule.cleanup.stripInvalid}"
                     IsChecked="{Binding StripInvalidCharacters}" />
                 <TextBox
-                    Width="76"
-                    Margin="10,0,0,0"
+                    Width="64"
+                    Margin="8,0,0,0"
                     HorizontalContentAlignment="Center"
                     AutomationProperties.LabeledBy="{Binding ElementName=CheckStripInvalid}"
                     IsEnabled="{Binding StripInvalidCharacters}"

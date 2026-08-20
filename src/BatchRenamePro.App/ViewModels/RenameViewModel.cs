@@ -199,13 +199,15 @@ public sealed partial class RenameViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task AddFolderAsync()
     {
-        var folder = _dialogs.PickFolder(_settings.Current.LastFolder);
-        if (folder is null) return;
+        var folders = _dialogs.PickFolders(_settings.Current.LastFolder);
+        if (folders.Count == 0) return;
 
-        _settings.Current.LastFolder = folder;
+        // Multi-select in a folder chooser can only return siblings, so any one of them points the
+        // picker back at the same place next time.
+        _settings.Current.LastFolder = folders[0];
         _settings.Save();
 
-        await AddPathsAsync([folder]).ConfigureAwait(true);
+        await AddPathsAsync(folders).ConfigureAwait(true);
     }
 
     /// <summary>Opens the file picker and adds what it returns.</summary>

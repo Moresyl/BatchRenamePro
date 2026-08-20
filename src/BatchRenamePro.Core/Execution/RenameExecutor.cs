@@ -19,6 +19,13 @@ namespace BatchRenamePro.Core.Execution;
 /// can be unwound in reverse. If the unwind itself fails the engine reports exactly which items were
 /// left behind rather than pretending the batch was clean.
 /// </para>
+/// <para>
+/// A batch may contain a folder and the items inside it at the same time. Every path in it is written
+/// against the tree as it stood when the plan was made, and renaming the folder invalidates all of
+/// them at once, so the executor keeps a running map of the folders it has already moved and resolves
+/// each path through it. That is what lets a batch be undone: an undo replays the same moves in
+/// reverse, which necessarily puts the folder back before the items inside it.
+/// </para>
 /// </remarks>
 public interface IRenameExecutor
 {
@@ -101,7 +108,7 @@ public sealed class RenameExecutor : IRenameExecutor
             .Where(sources.Contains)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        var currentPaths = new Dictionary<string, string>(operations.Length, StringComparer.OrdinalIgnoreCase);
+        var moved = new PathMap();
         var completed = new List<(string From, string To, bool IsDirectory)>(operations.Length * 2);
 
         try
@@ -111,10 +118,11 @@ public sealed class RenameExecutor : IRenameExecutor
                 if (!contested.Contains(operation.SourcePath)) continue;
 
                 cancellationToken.ThrowIfCancellationRequested();
-                var staged = CreateStagingPath(operation.SourcePath);
-                Move(operation.SourcePath, staged, operation.IsDirectory);
-                completed.Add((operation.SourcePath, staged, operation.IsDirectory));
-                currentPaths[operation.SourcePath] = staged;
+                var source = moved.Resolve(operation.SourcePath);
+                var staged = CreateStagingPath(source);
+                Move(source, staged, operation.IsDirectory);
+                completed.Add((source, staged, operation.IsDirectory));
+                moved.Record(source, staged, operation.IsDirectory);
             }
 
             for (var i = 0; i < operations.Length; i++)
@@ -122,11 +130,18 @@ public sealed class RenameExecutor : IRenameExecutor
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var operation = operations[i];
-                var from = currentPaths.GetValueOrDefault(operation.SourcePath, operation.SourcePath);
-                Move(from, operation.TargetPath, operation.IsDirectory);
-                completed.Add((from, operation.TargetPath, operation.IsDirectory));
+                var from = moved.Resolve(operation.SourcePath);
 
-                progress?.Report(new RenameProgress(i + 1, operations.Length, Path.GetFileName(operation.TargetPath)));
+                // The target is resolved through its parent only. Resolving the whole path would
+                // follow a staging move made for the item that currently holds this very name, and
+                // send the rename to the temporary file instead of to the name being vacated.
+                var to = moved.ResolveParentOf(operation.TargetPath);
+
+                Move(from, to, operation.IsDirectory);
+                completed.Add((from, to, operation.IsDirectory));
+                moved.Record(from, to, operation.IsDirectory);
+
+                progress?.Report(new RenameProgress(i + 1, operations.Length, Path.GetFileName(to)));
             }
         }
         catch (OperationCanceledException)
@@ -161,9 +176,6 @@ public sealed class RenameExecutor : IRenameExecutor
 
         foreach (var operation in operations)
         {
-            if (!File.Exists(operation.SourcePath) && !Directory.Exists(operation.SourcePath))
-                throw new RenameFailedException($"The item no longer exists: {operation.SourcePath}");
-
             if (!sources.Add(operation.SourcePath))
                 throw new RenameFailedException($"The same item appears twice in the batch: {operation.SourcePath}");
 
@@ -171,8 +183,17 @@ public sealed class RenameExecutor : IRenameExecutor
                 throw new RenameFailedException($"Two items would be renamed to the same path: {operation.TargetPath}");
         }
 
-        foreach (var operation in operations)
+        for (var i = 0; i < operations.Length; i++)
         {
+            var operation = operations[i];
+
+            // Not simply "does this exist right now": an item inside a folder that an earlier
+            // operation moves is described by a path that only becomes real once that move has
+            // happened. Undoing a batch that renamed a folder together with its contents is exactly
+            // that case, and rejecting it here would make such a batch permanent.
+            if (!File.Exists(operation.SourcePath) && !Directory.Exists(operation.SourcePath) && !Produces(operations, i, operation.SourcePath))
+                throw new RenameFailedException($"The item no longer exists: {operation.SourcePath}");
+
             // Occupied by something outside the batch means it is not going to move out of the way.
             var occupied = File.Exists(operation.TargetPath) || Directory.Exists(operation.TargetPath);
             if (occupied && !sources.Contains(operation.TargetPath))
@@ -180,6 +201,19 @@ public sealed class RenameExecutor : IRenameExecutor
         }
 
         return sources;
+    }
+
+    /// <summary>Whether one of the first <paramref name="count"/> operations puts <paramref name="path"/> within reach.</summary>
+    private static bool Produces(RenameOperation[] operations, int count, string path)
+    {
+        for (var i = 0; i < count; i++)
+        {
+            var target = operations[i].TargetPath;
+            if (PathMap.Same(path, target)) return true;
+            if (operations[i].IsDirectory && PathMap.IsUnder(path, target)) return true;
+        }
+
+        return false;
     }
 
     /// <summary>Reverses completed moves, newest first, and reports whatever could not be put back.</summary>
@@ -239,5 +273,61 @@ public sealed class RenameExecutor : IRenameExecutor
         return operations.Length == 1
             ? first
             : string.Create(CultureInfo.InvariantCulture, $"{first} +{operations.Length - 1}");
+    }
+
+    /// <summary>
+    /// Where the paths of a batch have gone, as the batch is carried out.
+    /// </summary>
+    /// <remarks>
+    /// Two kinds of move are recorded and they behave differently. A file that moves only redirects
+    /// its own path. A folder that moves redirects its own path and every path beneath it, which is
+    /// the whole point: <c>photos\raw\a.jpg</c> is no longer anywhere once <c>raw</c> becomes
+    /// <c>original</c>, and the batch still has an entry that calls it by the old name.
+    /// </remarks>
+    private sealed class PathMap
+    {
+        private readonly List<(string From, string To, bool IsDirectory)> _moves = [];
+
+        /// <summary>Notes that <paramref name="from"/> is now at <paramref name="to"/>.</summary>
+        public void Record(string from, string to, bool isDirectory)
+        {
+            if (Same(from, to)) return;
+            _moves.Add((from, to, isDirectory));
+        }
+
+        /// <summary>Follows a path recorded before the batch started to wherever it is now.</summary>
+        public string Resolve(string path)
+        {
+            foreach (var (from, to, isDirectory) in _moves)
+            {
+                if (Same(path, from)) path = to;
+                else if (isDirectory && IsUnder(path, from)) path = to + path[from.Length..];
+            }
+
+            return path;
+        }
+
+        /// <summary>
+        /// Follows the folder a path sits in, leaving the name itself alone. Used for the destination
+        /// of a rename, which does not exist yet and so cannot have moved.
+        /// </summary>
+        public string ResolveParentOf(string path)
+        {
+            var directory = Path.GetDirectoryName(path);
+            if (string.IsNullOrEmpty(directory)) return path;
+
+            var resolved = Resolve(directory);
+            return Same(resolved, directory) ? path : Path.Combine(resolved, Path.GetFileName(path));
+        }
+
+        /// <summary>Whether two paths name the same item, by the file system's own rules.</summary>
+        public static bool Same(string left, string right) =>
+            string.Equals(left, right, StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>Whether <paramref name="path"/> sits inside <paramref name="directory"/>.</summary>
+        public static bool IsUnder(string path, string directory) =>
+            path.Length > directory.Length
+            && path.StartsWith(directory, StringComparison.OrdinalIgnoreCase)
+            && (path[directory.Length] == Path.DirectorySeparatorChar || path[directory.Length] == Path.AltDirectorySeparatorChar);
     }
 }

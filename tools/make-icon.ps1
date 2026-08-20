@@ -77,11 +77,14 @@ function New-IconPixels([int] $Size) {
                     $plate = 1.0 - [Math]::Clamp((Get-RoundedRectDistance $x $y 8 8 240 240 56) / $feather + 0.5, 0.0, 1.0)
                     if ($plate -le 0) { continue }
 
-                    # Diagonal indigo-to-violet gradient across the plate.
+                    # Diagonal gradient across the plate, both ends the same blue as the accent
+                    # (#005FB8), with the light coming from the top left. One hue on purpose: the
+                    # mark sits beside the window it belongs to — in the taskbar, in the title bar
+                    # and in the notification area — and a second colour in it is a second brand.
                     $t = [Math]::Clamp(($x + $y - 16) / 480.0, 0.0, 1.0)
-                    $sampleRed = 79 + (151 - 79) * $t
-                    $sampleGreen = 110 + (86 - 110) * $t
-                    $sampleBlue = 247 + (246 - 247) * $t
+                    $sampleRed = 43 + (0 - 43) * $t
+                    $sampleGreen = 143 + (76 - 143) * $t
+                    $sampleBlue = 224 + (150 - 224) * $t
 
                     # White marks composited over the plate, all of them clipped to it.
                     $ink = 0.0

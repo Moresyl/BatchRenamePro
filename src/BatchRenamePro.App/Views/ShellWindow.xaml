@@ -8,79 +8,97 @@
     xmlns:views="clr-namespace:BatchRenamePro.App.Views"
     xmlns:vm="clr-namespace:BatchRenamePro.App.ViewModels"
     Title="{loc:T app.name}"
-    Width="1320"
-    Height="860"
-    MinWidth="1040"
-    MinHeight="620"
+    Width="1000"
+    Height="640"
     Background="{DynamicResource Brush.Bg.Base}"
     FontFamily="{StaticResource Font.Family}"
     Foreground="{DynamicResource Brush.Text.Primary}"
     Icon="pack://application:,,,/Assets/app-256.png"
+    ResizeMode="CanMinimize"
     TextOptions.TextFormattingMode="Ideal"
     TextOptions.TextRenderingMode="ClearType"
     UseLayoutRounding="True"
     WindowStartupLocation="CenterScreen">
 
     <!--
-        The window draws its own title bar so that the navigation rail can run the full height of
-        the window and the caption can carry the search-free, toolbar-free look the app is after.
+        The window draws its own title bar so the navigation tabs can sit in the caption strip beside
+        the title, the way Explorer and Edge do, instead of costing a band of their own below it.
         GlassFrameThickness is left at zero: the backdrop is applied through DWM in code-behind, and
         a glass frame on top of it would double up the material.
+
+        CanMinimize rather than NoResize. Both take away the resize border and the maximize box — and
+        with the maximize box goes everything that reaches for it behind your back: double-clicking
+        the caption, Win+Up, and dragging the window against the top of the screen. NoResize would
+        also take away the minimize box, and minimizing is how this application goes to the
+        notification area. So: no growing, no maximizing, still minimizes.
+
+        ResizeBorderThickness is zero to match. WindowChrome stops answering the resize hit-tests once
+        the window is fixed, but a six-pixel band along every edge that quietly swallows clicks is not
+        something to leave lying around on the strength of that.
     -->
     <shell:WindowChrome.WindowChrome>
         <shell:WindowChrome
-            CaptionHeight="38"
+            CaptionHeight="32"
             CornerRadius="0"
             GlassFrameThickness="0"
             NonClientFrameEdges="None"
-            ResizeBorderThickness="6"
+            ResizeBorderThickness="0"
             UseAeroCaptionButtons="False" />
     </shell:WindowChrome.WindowChrome>
 
     <Window.Resources>
 
-        <!-- A rail entry. The label goes away with the rail; the icon never does. -->
+        <!--
+            A tab. Neither the label nor the icon carries a style of its own: both inherit from the
+            container, which is what lets the selected tab darken its text and thicken its weight
+            without the template knowing anything about selection.
+        -->
         <DataTemplate x:Key="Nav.Template" DataType="{x:Type vm:NavigationItem}">
             <StackPanel Orientation="Horizontal">
                 <Path
-                    Width="17"
-                    Height="17"
+                    Width="{StaticResource Size.Icon}"
+                    Height="{StaticResource Size.Icon}"
                     Data="{Binding IconKey, Converter={StaticResource Resource}}"
                     Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
                     Style="{StaticResource Icon}" />
                 <TextBlock
-                    Margin="13,0,0,0"
+                    Margin="6,0,0,0"
                     VerticalAlignment="Center"
-                    Style="{StaticResource Text.Body}"
-                    Text="{Binding TitleCode, Converter={StaticResource Localize}}"
-                    Visibility="{Binding DataContext.IsNavigationExpanded, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisibility}}" />
+                    Text="{Binding TitleCode, Converter={StaticResource Localize}}" />
             </StackPanel>
         </DataTemplate>
 
         <!--
-            The rail entry's own container. Without an explicit name a screen reader falls back to
-            the bound record's ToString(), and once the rail collapses there is no label in the
-            template to fall back to either — so the title is stated here outright, and it stays
-            correct in both rail states and in both languages.
+            The tab's own container. Without an explicit name a screen reader falls back to the bound
+            record's ToString(), so the title is stated here outright and stays correct in both
+            languages. No tooltip: the label is right there, and repeating it is noise.
         -->
         <Style x:Key="Nav.Entry" BasedOn="{StaticResource Nav.Item}" TargetType="ListBoxItem">
             <Setter Property="AutomationProperties.Name" Value="{Binding TitleCode, Converter={StaticResource Localize}}" />
-            <Setter Property="ToolTip" Value="{Binding TitleCode, Converter={StaticResource Localize}}" />
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding DataContext.IsNavigationExpanded, RelativeSource={RelativeSource AncestorType=Window}}" Value="True">
-                    <!-- Expanded, the label is right there; a tooltip repeating it is just noise. -->
-                    <Setter Property="ToolTip" Value="{x:Null}" />
-                </DataTrigger>
-            </Style.Triggers>
         </Style>
+
+        <!--
+            What right-clicking the notification-area icon offers. While the window is hidden this
+            menu and a click on the icon are the only ways back into the application, so showing it
+            comes first; quitting is separated by a rule because it is the one item here that loses
+            work. Both items are handled in code-behind rather than bound to commands: neither is a
+            document operation, and the menu is opened from a Win32 message with no data context.
+        -->
+        <ContextMenu x:Key="Tray.Menu">
+            <MenuItem
+                Click="OnTrayShow"
+                Header="{loc:T tray.show}"
+                Icon="{StaticResource Icon.Window.Restore}" />
+            <Separator />
+            <MenuItem
+                Click="OnTrayExit"
+                Header="{loc:T tray.exit}"
+                Icon="{StaticResource Icon.Window.Close}" />
+        </ContextMenu>
     </Window.Resources>
 
     <Border x:Name="RootBorder" Background="{DynamicResource Brush.Bg.Base}">
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -88,24 +106,29 @@
 
             <!-- ==== Title bar ================================================================= -->
 
-            <Grid
-                Grid.ColumnSpan="2"
-                Height="38"
-                Background="Transparent">
+            <!--
+                Identity, then the tabs, then the window buttons — one strip doing the work of the
+                three bands this used to take. Everything clickable in here declares itself hit-test
+                visible, because the chrome's caption band is a drag handle by default and would
+                otherwise swallow the clicks before they reached a tab.
+            -->
+            <Grid Height="{StaticResource Size.Caption}" Background="Transparent">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <StackPanel
-                    Margin="14,0,0,0"
+                    Margin="10,0,0,0"
                     VerticalAlignment="Center"
                     Orientation="Horizontal">
                     <Image
-                        Width="17"
-                        Height="17"
-                        Margin="0,0,9,0"
+                        Width="15"
+                        Height="15"
+                        Margin="0,0,7,0"
                         RenderOptions.BitmapScalingMode="HighQuality"
                         Source="pack://application:,,,/Assets/app-256.png" />
                     <TextBlock
@@ -114,9 +137,40 @@
                         Foreground="{DynamicResource Brush.Text.Secondary}"
                         Style="{StaticResource Text.Caption}"
                         Text="{loc:T app.name}" />
+                    <Border
+                        Width="1"
+                        Height="14"
+                        Margin="10,0,4,0"
+                        Background="{DynamicResource Brush.Stroke.Default}" />
                 </StackPanel>
 
-                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <ListBox
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                    ItemContainerStyle="{StaticResource Nav.Entry}"
+                    ItemTemplate="{StaticResource Nav.Template}"
+                    ItemsSource="{x:Static vm:ShellViewModel.PrimaryNavigation}"
+                    SelectedValue="{Binding Page}"
+                    SelectedValuePath="Page"
+                    Style="{StaticResource Nav.Strip}" />
+
+                <ListBox
+                    Grid.Column="3"
+                    Margin="0,0,6,0"
+                    VerticalAlignment="Center"
+                    shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                    ItemContainerStyle="{StaticResource Nav.Entry}"
+                    ItemTemplate="{StaticResource Nav.Template}"
+                    ItemsSource="{x:Static vm:ShellViewModel.SecondaryNavigation}"
+                    SelectedValue="{Binding Page}"
+                    SelectedValuePath="Page"
+                    Style="{StaticResource Nav.Strip}" />
+
+                <StackPanel
+                    Grid.Column="4"
+                    shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                    Orientation="Horizontal">
                     <Button
                         AutomationProperties.Name="{Binding Update.BadgeText}"
                         Command="{Binding Update.OpenReleaseCommand}"
@@ -139,67 +193,21 @@
                         </Button.Style>
                     </Button>
 
+                    <!--
+                        No maximize button between these two. The window is a fixed size on purpose,
+                        and a button that cannot do the thing it draws is worse than no button.
+                    -->
                     <Button
                         Click="OnMinimize"
                         Style="{StaticResource Button.Window}"
                         Tag="{StaticResource Icon.Window.Minimize}"
                         ToolTip="{loc:T window.minimize}" />
                     <Button
-                        x:Name="MaximizeButton"
-                        Click="OnMaximizeRestore"
-                        Style="{StaticResource Button.Window}"
-                        Tag="{StaticResource Icon.Window.Maximize}"
-                        ToolTip="{loc:T window.maximize}" />
-                    <Button
                         Click="OnClose"
                         Style="{StaticResource Button.Window.Close}"
                         Tag="{StaticResource Icon.Window.Close}"
                         ToolTip="{loc:T window.close}" />
                 </StackPanel>
-            </Grid>
-
-            <!-- ==== Navigation rail =========================================================== -->
-
-            <Grid Grid.Row="1" Margin="10,4,6,16">
-                <Grid.Style>
-                    <Style TargetType="Grid">
-                        <Setter Property="Width" Value="56" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsNavigationExpanded}" Value="True">
-                                <Setter Property="Width" Value="206" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <Button
-                    Margin="4,0,0,8"
-                    HorizontalAlignment="Left"
-                    Command="{Binding ToggleNavigationCommand}"
-                    Style="{StaticResource Button.Icon}"
-                    Tag="{StaticResource Icon.Menu}"
-                    ToolTip="{loc:T nav.toggle}" />
-
-                <ListBox
-                    Grid.Row="1"
-                    ItemContainerStyle="{StaticResource Nav.Entry}"
-                    ItemTemplate="{StaticResource Nav.Template}"
-                    ItemsSource="{x:Static vm:ShellViewModel.PrimaryNavigation}"
-                    SelectedValue="{Binding Page}"
-                    SelectedValuePath="Page" />
-
-                <ListBox
-                    Grid.Row="2"
-                    ItemContainerStyle="{StaticResource Nav.Entry}"
-                    ItemTemplate="{StaticResource Nav.Template}"
-                    ItemsSource="{x:Static vm:ShellViewModel.SecondaryNavigation}"
-                    SelectedValue="{Binding Page}"
-                    SelectedValuePath="Page" />
             </Grid>
 
             <!-- ==== Pages ==================================================================== -->
@@ -209,7 +217,7 @@
                 pipeline, a scroll position and an expanded card intact across a trip to Settings.
                 The pages are cheap; rebuilding the user's train of thought is not.
             -->
-            <Grid Grid.Row="1" Grid.Column="1">
+            <Grid Grid.Row="1">
                 <views:RenamePage
                     DataContext="{Binding Rename}"
                     Visibility="{Binding DataContext.Page, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource EqualsToVisibility}, ConverterParameter=Rename}" />
@@ -231,18 +239,17 @@
 
             <ItemsControl
                 Grid.Row="1"
-                Grid.Column="1"
-                Margin="0,0,32,32"
+                Margin="0,0,16,16"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
                 ItemsSource="{Binding Notifications.Items}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type services:Notification}">
                         <Border
-                            MinWidth="300"
-                            MaxWidth="420"
-                            Margin="0,8,0,0"
-                            Padding="14,12"
+                            MinWidth="260"
+                            MaxWidth="380"
+                            Margin="0,6,0,0"
+                            Padding="11,9"
                             Background="{DynamicResource Brush.Bg.Flyout}"
                             BorderBrush="{DynamicResource Brush.Stroke.Default}"
                             BorderThickness="1"
@@ -284,9 +291,9 @@
 
                                 <Path
                                     x:Name="Glyph"
-                                    Width="17"
-                                    Height="17"
-                                    Margin="0,1,12,0"
+                                    Width="{StaticResource Size.Icon}"
+                                    Height="{StaticResource Size.Icon}"
+                                    Margin="0,1,9,0"
                                     VerticalAlignment="Top"
                                     Data="{StaticResource Icon.Info}"
                                     Fill="{DynamicResource Brush.Info}"
@@ -301,7 +308,7 @@
 
                                 <Button
                                     Grid.Column="2"
-                                    Margin="10,0,0,0"
+                                    Margin="8,0,0,0"
                                     VerticalAlignment="Center"
                                     Command="{Binding InvokeCommand}"
                                     Content="{Binding ActionLabel}"
@@ -340,11 +347,10 @@
 
             <Grid
                 Grid.RowSpan="2"
-                Grid.ColumnSpan="2"
                 Background="{DynamicResource Brush.Bg.Scrim}"
                 Visibility="{Binding Dialogs.Current, Converter={StaticResource NullToVisibility}}">
                 <ContentControl
-                    Width="440"
+                    Width="384"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Content="{Binding Dialogs.Current}"
@@ -352,19 +358,19 @@
                     <ContentControl.ContentTemplate>
                         <DataTemplate DataType="{x:Type services:DialogRequest}">
                             <Border
-                                Padding="24,22"
+                                Padding="18,15"
                                 Background="{DynamicResource Brush.Bg.Flyout}"
                                 BorderBrush="{DynamicResource Brush.Stroke.Default}"
                                 BorderThickness="1"
                                 CornerRadius="{StaticResource Radius.XLarge}"
                                 Effect="{DynamicResource Effect.Shadow.Flyout}">
                                 <StackPanel>
-                                    <StackPanel Margin="0,0,0,12" Orientation="Horizontal">
+                                    <StackPanel Margin="0,0,0,9" Orientation="Horizontal">
                                         <Path
                                             x:Name="Glyph"
-                                            Width="20"
-                                            Height="20"
-                                            Margin="0,0,12,0"
+                                            Width="17"
+                                            Height="17"
+                                            Margin="0,0,9,0"
                                             VerticalAlignment="Center"
                                             Data="{StaticResource Icon.Question}"
                                             Fill="{DynamicResource Brush.Accent.Default}"
@@ -382,17 +388,17 @@
 
                                     <TextBox
                                         x:Name="Input"
-                                        Margin="0,14,0,0"
+                                        Margin="0,10,0,0"
                                         Text="{Binding Input, UpdateSourceTrigger=PropertyChanged}"
                                         Visibility="{Binding IsInput, Converter={StaticResource BoolToVisibility}}" />
 
                                     <StackPanel
-                                        Margin="0,22,0,0"
+                                        Margin="0,16,0,0"
                                         HorizontalAlignment="Right"
                                         Orientation="Horizontal">
                                         <Button
-                                            MinWidth="92"
-                                            Margin="0,0,8,0"
+                                            MinWidth="78"
+                                            Margin="0,0,6,0"
                                             HorizontalContentAlignment="Center"
                                             Command="{Binding CancelCommand}"
                                             Content="{Binding CancelLabel}"
@@ -400,7 +406,7 @@
                                             Visibility="{Binding CanCancel, Converter={StaticResource BoolToVisibility}}" />
                                         <Button
                                             x:Name="Confirm"
-                                            MinWidth="92"
+                                            MinWidth="78"
                                             HorizontalContentAlignment="Center"
                                             Command="{Binding ConfirmCommand}"
                                             Content="{Binding ConfirmLabel}"

@@ -24,16 +24,21 @@ that risk. Every rule you add updates a live preview with the old and new name s
 changed characters highlighted; anything unsafe is blocked *before* the first file moves; and what
 does run is a two-phase transaction that rolls itself back if any step fails.
 
+<div align="center">
+
+<img src="docs/images/rename-light.png" width="49%" alt="The rename page in the light theme: rules panel on the left, file list on the right">
+<img src="docs/images/rename-dark.png" width="49%" alt="The same page in the dark theme">
+
+<sub>The rename page, light and dark — switchable at runtime, no restart.</sub>
+
+</div>
+
 <!--
-    Screenshots go here, and they are the biggest thing this README is still missing — for a
-    desktop app they do more than any paragraph above. Take three at 1320x860 with the window
-    maximised, save them under docs/images/, and reference them with a <div align="center"> block:
-
-      1. rename.png    the rename page with a few rules stacked and the preview showing diffs
-      2. presets.png   the presets page
-      3. dark.png      the same rename page in the other theme, to show the theming off
-
-    Keep each under about 400 KB — a PNG that size loads instantly on a phone.
+    These two are the app at rest. Still wanted, and worth more than either of them: the same page
+    with a few rules stacked and the preview column showing before → after with the diffs
+    highlighted, which is the one claim above that a picture can actually settle. One of the presets
+    page too. Save them beside these as rename.png and presets.png at the window's natural size
+    (~1250x800), under about 400 KB each, and swap them in above.
 -->
 
 ## Highlights
@@ -83,8 +88,8 @@ Get-FileHash .\BatchRenamePro-win-x64.zip -Algorithm SHA256
 |---|---|
 | **Pattern** | Rebuilds the name from a template: `{modified:yyyy-MM-dd}_{name}_{index:000}`. Also accepts the classic `*` (original name) and `#` (counter). |
 | **Replace** | Find and replace, literal or regular expression, optionally case-insensitive. |
-| **Number** | Sequential numbering as a prefix or suffix — start, step, zero-padding, group size, digits or letters. |
-| **Insert** | Puts text at the front, at the back, or at a character position. |
+| **Number** | Names items after a running counter — start, step, zero-padding, group size, digits or letters. Clear "Replace the whole name" and the counter goes in front of, behind, or inside the existing name instead. |
+| **Text** | Names items after a piece of text, tokens included. Clearing "Replace the whole name" turns it back into an insert at the front, the back or a character position. |
 | **Remove** | Deletes a character range, or every digit, symbol or space. |
 | **Case** | UPPER, lower, Title Case, Sentence case. |
 | **Extension** | Change, add, remove or normalise the extension's case. |

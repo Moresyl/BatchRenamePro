@@ -15,7 +15,7 @@ public sealed class PresetStoreTests
             new PatternRule { Pattern = "{modified:yyyy-MM-dd}_{name}", Scope = RenameScope.BaseName },
             new ReplaceRule { Find = @"\s+", ReplaceWith = "-", UseRegex = true },
             new CaseRule { Mode = CaseMode.Lower },
-            new NumberRule { Position = InsertPosition.Suffix, Sequence = new SequenceSettings { Start = 5, Padding = 4, Style = SequenceStyle.Base36 } },
+            new NumberRule { ReplacesName = false, Position = InsertPosition.Suffix, Sequence = new SequenceSettings { Start = 5, Padding = 4, Style = SequenceStyle.Base36 } },
             new CleanupRule { RemoveDiacritics = true, MaxLength = 60 },
             new ExtensionRule { Mode = ExtensionMode.Replace, NewExtension = "md" },
             new RemoveRule { Mode = RemoveMode.Digits },
@@ -44,6 +44,10 @@ public sealed class PresetStoreTests
         Assert.AreEqual("{modified:yyyy-MM-dd}_{name}", pattern.Pattern);
 
         var number = (NumberRule)loaded.Rules[3];
+
+        // A switch that defaults to true has to be written out when it is false, or a preset that
+        // was saved keeping the name comes back replacing it.
+        Assert.IsFalse(number.ReplacesName);
         Assert.AreEqual(5, number.Sequence.Start);
         Assert.AreEqual(4, number.Sequence.Padding);
         Assert.AreEqual(SequenceStyle.Base36, number.Sequence.Style);
