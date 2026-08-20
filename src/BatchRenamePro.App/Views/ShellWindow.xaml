@@ -173,7 +173,7 @@
                     Orientation="Horizontal">
                     <Button
                         AutomationProperties.Name="{Binding Update.BadgeText}"
-                        Command="{Binding Update.OpenReleaseCommand}"
+                        Command="{Binding Update.InstallCommand}"
                         Style="{StaticResource Button.Window}"
                         Tag="{StaticResource Icon.Refresh}"
                         ToolTip="{Binding Update.BadgeText}"

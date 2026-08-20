@@ -53,8 +53,8 @@ does run is a two-phase transaction that rolls itself back if any step fails.
 | **Tokens** | 22 placeholders — name, extension, parent folder, index, total, size, created/modified dates with custom formats, GUID, random suffix — with an in-app reference. |
 | **Bilingual and accessible** | Ships zh-CN and en-US, switchable at runtime with no restart. Every interactive element is named for screen readers, verified by an automated UI Automation sweep. |
 | **Modern Windows shell** | Custom title bar, Mica/Acrylic backdrop, light/dark/system theming, Per-Monitor V2 DPI, rounded corners on Windows 11 with automatic fallback on Windows 10. |
-| **Release-aware** | Optionally checks GitHub Releases at startup, shows the exact release notes in-app, and opens the matching GitHub page with one click. It never downloads or runs an update itself. |
-| **Private by construction** | No telemetry and no elevation. The only optional network call reads public GitHub Release metadata; history and logs stay under `%LOCALAPPDATA%`. |
+| **One-click updates** | Optionally checks GitHub Releases at startup and shows the exact notes in-app. With one click it downloads the architecture-matched MSI, verifies its published SHA-256, asks for Windows UAC consent, upgrades and restarts. |
+| **Private by construction** | No telemetry. Update checks and user-requested package downloads use the public GitHub Release only; history and logs stay under `%LOCALAPPDATA%`. |
 
 ## Install
 
@@ -178,11 +178,12 @@ Adding a rule means implementing `IRenameRule`, registering it in `RuleCatalog`,
 
 ## Data and privacy
 
-The app runs as a normal user and never elevates. If **Check for updates at startup** is enabled, it
-makes one anonymous request to the configured public GitHub repository's latest Release endpoint.
-That response supplies only the version, publication date and release notes shown in the app. The
-setting can be disabled, and no file names, history, presets, logs, identifiers or usage data are
-uploaded.
+The app normally runs as a standard user. If **Check for updates at startup** is enabled, it makes
+one anonymous request to the configured public GitHub repository's latest Release endpoint. When
+the user explicitly chooses **Update now**, it downloads the matching MSI and `SHA256SUMS.txt`,
+verifies the installer, and then asks for UAC consent before Windows Installer upgrades the app.
+The setting can be disabled, and no file names, history, presets, logs, identifiers or usage data
+are uploaded.
 
 Everything it writes lives in one folder, `%APPDATA%\BatchRenamePro`:
 

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.4] — 2026-08-20
+
+### Added
+
+- Updates can now be installed directly from the in-app release notice. The updater selects the MSI
+  for the running architecture, downloads the release checksum manifest and installer, verifies
+  SHA-256, starts the Windows Installer upgrade with UAC consent, and relaunches the application.
+- Download, verification and installer-start progress is shown on the update button. The exact
+  GitHub Release page remains available as a fallback.
+
+### Fixed
+
+- Desktop and Start-menu shortcuts now explicitly reference the icon embedded in every MSI instead
+  of relying on Explorer to infer it from the advertised executable shortcut.
+- Installer CI now rejects an MSI whose shortcut rows are missing the embedded product icon.
+
 ## [2.0.3] — 2026-08-20
 
 ### Fixed

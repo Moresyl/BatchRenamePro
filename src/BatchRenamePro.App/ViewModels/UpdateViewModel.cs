@@ -1,7 +1,9 @@
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Net.Http;
 using System.Text.Json;
+using System.Windows;
 using BatchRenamePro.App.Localization;
 using BatchRenamePro.App.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -16,6 +18,7 @@ public sealed partial class UpdateViewModel : ObservableObject, IDisposable
     private static readonly TimeSpan StartupDelay = TimeSpan.FromSeconds(1);
 
     private readonly IUpdateService _updates;
+    private readonly IUpdateInstaller _installer;
     private readonly ISettingsService _settings;
     private readonly INotificationService _notifications;
     private readonly ILocalizer _localizer;
@@ -27,6 +30,18 @@ public sealed partial class UpdateViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CheckButtonText))]
     private bool _isChecking;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(InstallButtonText))]
+    private bool _isInstalling;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(InstallButtonText))]
+    private int _downloadPercentage;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(InstallButtonText))]
+    private UpdateInstallStage _installStage;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasUpdate))]
@@ -41,6 +56,7 @@ public sealed partial class UpdateViewModel : ObservableObject, IDisposable
     /// <summary>Creates the update state.</summary>
     public UpdateViewModel(
         IUpdateService updates,
+        IUpdateInstaller installer,
         ISettingsService settings,
         INotificationService notifications,
         ILocalizer localizer,
@@ -48,6 +64,7 @@ public sealed partial class UpdateViewModel : ObservableObject, IDisposable
         ILogger<UpdateViewModel> logger)
     {
         _updates = updates;
+        _installer = installer;
         _settings = settings;
         _notifications = notifications;
         _localizer = localizer;
@@ -89,6 +106,16 @@ public sealed partial class UpdateViewModel : ObservableObject, IDisposable
     /// <summary>Label that follows the asynchronous check state.</summary>
     public string CheckButtonText => _localizer[IsChecking ? "update.checking" : "update.check"];
 
+    /// <summary>Label that follows download, verification and installer startup.</summary>
+    public string InstallButtonText => !IsInstalling
+        ? _localizer["update.install"]
+        : InstallStage switch
+        {
+            UpdateInstallStage.Downloading => _localizer.Format("update.downloading", DownloadPercentage),
+            UpdateInstallStage.Verifying => _localizer["update.verifying"],
+            _ => _localizer["update.startingInstaller"]
+        };
+
     private bool IsDismissed => AvailableUpdate is { } update && string.Equals(
         _settings.Current.DismissedUpdateVersion,
         update.Version,
@@ -104,8 +131,43 @@ public sealed partial class UpdateViewModel : ObservableObject, IDisposable
     }
 
     /// <summary>Checks immediately and always reports the outcome.</summary>
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanCheck))]
     private Task CheckAsync() => CheckCoreAsync(manual: true, CancellationToken.None);
+
+    private bool CanCheck() => !IsChecking && !IsInstalling;
+
+    /// <summary>Downloads the matching MSI, verifies it and starts the elevated upgrade.</summary>
+    [RelayCommand(CanExecute = nameof(CanInstall))]
+    private async Task InstallAsync()
+    {
+        if (AvailableUpdate is not { } update) return;
+
+        IsInstalling = true;
+        DownloadPercentage = 0;
+        InstallStage = UpdateInstallStage.Downloading;
+        try
+        {
+            var progress = new Progress<UpdateInstallProgress>(value =>
+            {
+                InstallStage = value.Stage;
+                DownloadPercentage = value.Percentage;
+            });
+            await _installer.DownloadAndLaunchAsync(update, progress).ConfigureAwait(true);
+
+            // The detached helper waits for this process before asking Windows Installer to replace it.
+            Application.Current.Shutdown();
+        }
+        catch (Exception error) when (error is
+            HttpRequestException or IOException or UnauthorizedAccessException or InvalidOperationException or
+            PlatformNotSupportedException or TaskCanceledException)
+        {
+            _logger.LogWarning(error, "Automatic update failed");
+            _notifications.Show(_localizer["update.installFailed"], NotificationKind.Error);
+            IsInstalling = false;
+        }
+    }
+
+    private bool CanInstall() => AvailableUpdate is not null && !IsChecking && !IsInstalling;
 
     /// <summary>Opens the exact release page on GitHub.</summary>
     [RelayCommand]
@@ -180,12 +242,8 @@ public sealed partial class UpdateViewModel : ObservableObject, IDisposable
         _notifications.Show(
             _localizer.Format("update.availableToast", update.Version),
             NotificationKind.Information,
-            _localizer["update.openGithub"],
-            () =>
-            {
-                _launcher.Open(update.ReleaseUrl);
-                return Task.CompletedTask;
-            });
+            _localizer["update.install"],
+            InstallAsync);
     }
 
     private void OnLanguageChanged(object? sender, PropertyChangedEventArgs e)
@@ -196,7 +254,22 @@ public sealed partial class UpdateViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(PublishedAt));
         OnPropertyChanged(nameof(BadgeText));
         OnPropertyChanged(nameof(CheckButtonText));
+        OnPropertyChanged(nameof(InstallButtonText));
     }
 
     private void OnSettingsReloaded(object? sender, EventArgs e) => OnPropertyChanged(nameof(ShowBadge));
+
+    partial void OnAvailableUpdateChanged(AppUpdateInfo? value) => InstallCommand.NotifyCanExecuteChanged();
+
+    partial void OnIsCheckingChanged(bool value)
+    {
+        CheckCommand.NotifyCanExecuteChanged();
+        InstallCommand.NotifyCanExecuteChanged();
+    }
+
+    partial void OnIsInstallingChanged(bool value)
+    {
+        CheckCommand.NotifyCanExecuteChanged();
+        InstallCommand.NotifyCanExecuteChanged();
+    }
 }

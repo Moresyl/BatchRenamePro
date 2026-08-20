@@ -40,6 +40,8 @@
                 Name="Batch Rename Pro"
                 Description="安全、现代的 Windows 批量文件改名工具"
                 WorkingDirectory="INSTALLFOLDER"
+                Icon="ProductIcon.ico"
+                IconIndex="0"
                 Advertise="yes" />
               <Shortcut
                 Id="DesktopShortcut"
@@ -47,6 +49,8 @@
                 Name="Batch Rename Pro"
                 Description="安全、现代的 Windows 批量文件改名工具"
                 WorkingDirectory="INSTALLFOLDER"
+                Icon="ProductIcon.ico"
+                IconIndex="0"
                 Advertise="yes" />
             </File>
             <RemoveFolder Id="RemoveProgramMenuDirectory" Directory="ProgramMenuDirectory" On="uninstall" />

@@ -51,6 +51,7 @@ public sealed class GitHubUpdateServiceTests
         Assert.AreEqual("Batch Rename Pro 2.1", result.Update.Title);
         StringAssert.Contains(result.Update.Notes, "update notifications");
         Assert.AreEqual("https://github.com/Moresyl/BatchRenamePro/releases/tag/v2.1.0", result.Update.ReleaseUrl);
+        Assert.AreEqual("v2.1.0", result.Update.TagName);
         Assert.AreEqual(new DateTimeOffset(2026, 8, 20, 8, 30, 0, TimeSpan.Zero), result.Update.PublishedAt);
         Assert.AreEqual("https://api.github.com/repos/Moresyl/BatchRenamePro/releases/latest", handler.LastRequestUri?.AbsoluteUri);
         CollectionAssert.Contains(handler.LastAcceptHeaders, "application/vnd.github+json");

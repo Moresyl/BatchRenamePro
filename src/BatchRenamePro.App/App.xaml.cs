@@ -104,6 +104,7 @@ public partial class App : Application
         services.AddSingleton<IUpdateService>(provider => new GitHubUpdateService(
             provider.GetRequiredService<HttpClient>(),
             ProductLinks.Repository));
+        services.AddSingleton<IUpdateInstaller>(_ => new WindowsUpdateInstaller(ProductLinks.Repository));
         services.AddSingleton<DialogHost>();
         services.AddSingleton<IDialogService, DialogService>();
 

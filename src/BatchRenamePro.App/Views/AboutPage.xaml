@@ -80,6 +80,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Margin="0,0,18,0">
@@ -102,10 +103,18 @@
                             <Button
                                 Grid.Column="3"
                                 Margin="6,0,0,0"
+                                AutomationProperties.Name="{loc:T update.install}"
+                                Command="{Binding Update.InstallCommand}"
+                                Content="{Binding Update.InstallButtonText}"
+                                Style="{StaticResource Button.Accent}"
+                                Tag="{StaticResource Icon.Refresh}"
+                                Visibility="{Binding Update.HasUpdate, Converter={StaticResource BoolToVisibility}}" />
+                            <Button
+                                Grid.Column="4"
+                                Margin="6,0,0,0"
                                 AutomationProperties.Name="{loc:T update.openGithub}"
                                 Command="{Binding Update.OpenReleaseCommand}"
                                 Content="{loc:T update.openGithub}"
-                                Style="{StaticResource Button.Accent}"
                                 Tag="{StaticResource Icon.Link}"
                                 Visibility="{Binding Update.HasUpdate, Converter={StaticResource BoolToVisibility}}" />
                         </Grid>

@@ -26,12 +26,14 @@ public enum UpdateCheckStatus
 /// <param name="Notes">Release notes supplied by GitHub.</param>
 /// <param name="PublishedAt">When the release was published.</param>
 /// <param name="ReleaseUrl">The exact GitHub release page.</param>
+/// <param name="TagName">The exact trusted release tag used to locate signed assets.</param>
 public sealed record AppUpdateInfo(
     string Version,
     string Title,
     string Notes,
     DateTimeOffset? PublishedAt,
-    string ReleaseUrl);
+    string ReleaseUrl,
+    string TagName);
 
 /// <summary>Result returned by an update channel.</summary>
 /// <param name="Status">Whether an update exists.</param>
@@ -133,7 +135,8 @@ public sealed class GitHubUpdateService : IUpdateService
                 title,
                 release.Body?.Trim() ?? string.Empty,
                 release.PublishedAt,
-                releaseUrl));
+                releaseUrl,
+                release.TagName));
     }
 
     private static bool TryParseVersion(string? value, bool allowPrerelease, out Version version)

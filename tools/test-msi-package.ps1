@@ -49,9 +49,24 @@ try {
         throw 'The MSI does not contain the required Desktop shortcut.'
     }
 
+    $desktopIcon = Get-MsiValue -Query "SELECT `Icon_` FROM `Shortcut` WHERE `Shortcut` = 'DesktopShortcut'"
+    if ($desktopIcon -ne 'ProductIcon.ico') {
+        throw 'The Desktop shortcut is not explicitly bound to the product icon.'
+    }
+
     $startMenuDirectory = Get-MsiValue -Query "SELECT `Directory_` FROM `Shortcut` WHERE `Shortcut` = 'StartMenuShortcut'"
     if ($startMenuDirectory -ne 'ProgramMenuDirectory') {
         throw 'The MSI does not contain the required Start-menu shortcut.'
+    }
+
+    $startMenuIcon = Get-MsiValue -Query "SELECT `Icon_` FROM `Shortcut` WHERE `Shortcut` = 'StartMenuShortcut'"
+    if ($startMenuIcon -ne 'ProductIcon.ico') {
+        throw 'The Start-menu shortcut is not explicitly bound to the product icon.'
+    }
+
+    $productIcon = Get-MsiValue -Query "SELECT `Name` FROM `Icon` WHERE `Name` = 'ProductIcon.ico'"
+    if ($productIcon -ne 'ProductIcon.ico') {
+        throw 'The MSI does not embed the product icon.'
     }
 
     $installLocationSource = Get-MsiValue `
@@ -94,7 +109,7 @@ try {
     }
 
     Write-Output "Verified MSI contract for Batch Rename Pro $ExpectedVersion"
-    Write-Output 'Verified product subfolder, executable, shortcuts, and InstallLocation registration'
+    Write-Output 'Verified product subfolder, executable, shortcut icons, and InstallLocation registration'
 }
 finally {
     [Runtime.InteropServices.Marshal]::FinalReleaseComObject($database) | Out-Null

@@ -37,11 +37,12 @@ anonymous.
 
 Worth stating plainly, because it decides what counts as a vulnerability here.
 
-The application runs as a normal user, never requests elevation, has no telemetry and has no server
-component. Its only optional network request is an anonymous read of the configured public GitHub
-repository's latest Release metadata. It never downloads or executes an update, and it uploads no
-file names, history, presets, logs, identifiers or usage data. Everything it writes lives under
-`%APPDATA%\BatchRenamePro`.
+The application normally runs as a standard user, has no telemetry and has no server component. It
+anonymously reads the configured public GitHub repository's latest Release metadata when update
+checks are enabled. Only after the user explicitly chooses to update does it download the
+architecture-matched MSI and checksum manifest, verify SHA-256, and request elevation for Windows
+Installer. It uploads no file names, history, presets, logs, identifiers or usage data. Persistent
+application data lives under `%APPDATA%\BatchRenamePro`.
 
 The untrusted inputs are therefore:
 
@@ -51,9 +52,9 @@ The untrusted inputs are therefore:
 - **Preset files** (`Presets\*.json`), which a user might be handed by someone else.
 - **History files** (`History\*.json`) used to drive undo.
 - **Rule input**, notably regular expressions, which can be written to backtrack catastrophically.
-- **GitHub Release metadata**, treated as untrusted display text. The browser destination is rebuilt
-  locally from the configured repository and returned tag rather than trusting an arbitrary URL in
-  the response.
+- **GitHub Release metadata and assets.** Browser and download destinations are rebuilt locally from
+  the configured repository and returned tag. Downloaded MSI packages are not launched until their
+  SHA-256 matches the release's checksum manifest.
 
 ### In scope
 
