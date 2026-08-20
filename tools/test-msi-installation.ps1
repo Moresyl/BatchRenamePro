@@ -41,18 +41,37 @@ $registryPaths = @(
 )
 $installed = $false
 
+function Invoke-WindowsInstaller {
+    param(
+        [Parameter(Mandatory)]
+        [string[]] $ArgumentList,
+
+        [Parameter(Mandatory)]
+        [string] $Operation,
+
+        [Parameter(Mandatory)]
+        [string] $LogPath
+    )
+
+    $process = Start-Process -FilePath 'msiexec.exe' -ArgumentList $ArgumentList -PassThru
+    if (-not $process.WaitForExit(300000)) {
+        Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+        throw "MSI $Operation timed out after five minutes. See $LogPath"
+    }
+
+    if ($process.ExitCode -notin 0, 3010) {
+        throw "MSI $Operation failed with exit code $($process.ExitCode). See $LogPath"
+    }
+}
+
 try {
-    $install = Start-Process -FilePath 'msiexec.exe' -ArgumentList @(
+    Invoke-WindowsInstaller -Operation 'installation' -LogPath $installLog -ArgumentList @(
         '/i', "`"$msi`"",
         '/qn',
         '/norestart',
         "`"INSTALLFOLDER=$destination`"",
         '/l*v', "`"$installLog`""
-    ) -Wait -PassThru
-
-    if ($install.ExitCode -notin 0, 3010) {
-        throw "MSI installation failed with exit code $($install.ExitCode). See $installLog"
-    }
+    )
 
     $installed = $true
     $exe = Join-Path $destination 'BatchRenamePro.exe'
@@ -87,16 +106,12 @@ try {
 }
 finally {
     if ($installed) {
-        $uninstall = Start-Process -FilePath 'msiexec.exe' -ArgumentList @(
+        Invoke-WindowsInstaller -Operation 'uninstall' -LogPath $uninstallLog -ArgumentList @(
             '/x', $productCode,
             '/qn',
             '/norestart',
             '/l*v', "`"$uninstallLog`""
-        ) -Wait -PassThru
-
-        if ($uninstall.ExitCode -notin 0, 3010) {
-            throw "MSI uninstall failed with exit code $($uninstall.ExitCode). See $uninstallLog"
-        }
+        )
 
         if (Test-Path -LiteralPath (Join-Path $destination 'BatchRenamePro.exe')) {
             throw "The installed executable remained after uninstalling from $destination"
