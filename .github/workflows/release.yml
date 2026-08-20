@@ -116,13 +116,18 @@ jobs:
         shell: bash
         run: |
           version="${GITHUB_REF_NAME#v}"
-          # Lift this version's section out of the changelog: everything between its heading
-          # and the next one. Falls back to a link if the section is missing.
-          notes=$(awk -v v="$version" '
-            $0 ~ "^## \\[" v "\\]" { found = 1; next }
-            found && /^## \[/ { exit }
-            found { print }
-          ' CHANGELOG.md)
+          notes_file=".github/release-notes/v${version}.md"
+          if [ -f "$notes_file" ]; then
+            notes=$(cat "$notes_file")
+          else
+            # Lift this version's section out of the changelog: everything between its heading
+            # and the next one. Falls back to a link if the section is missing.
+            notes=$(awk -v v="$version" '
+              $0 ~ "^## \\[" v "\\]" { found = 1; next }
+              found && /^## \[/ { exit }
+              found { print }
+            ' CHANGELOG.md)
+          fi
 
           if [ -z "$(echo "$notes" | tr -d '[:space:]')" ]; then
             notes="See [CHANGELOG.md](https://github.com/${GITHUB_REPOSITORY}/blob/main/CHANGELOG.md)."
@@ -156,9 +161,13 @@ jobs:
       - name: Create the release
         uses: softprops/action-gh-release@v3
         with:
+          name: Batch Rename Pro ${{ github.ref_name }}
           files: |
             dist/*.zip
             dist/SHA256SUMS.txt
           body: ${{ steps.notes.outputs.notes }}
-          draft: true
+          draft: false
+          prerelease: false
+          make_latest: true
+          fail_on_unmatched_files: true
           generate_release_notes: false

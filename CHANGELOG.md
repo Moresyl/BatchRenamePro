@@ -7,19 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- A GitHub Releases update centre inspired by cc-switch: optional delayed startup checks, a title-bar
-  notification, release notes and publication date on the About page, manual checks, persistent
-  “ignore this version”, and one-click opening of the exact GitHub Release.
-- A separately testable application update channel with strict repository parsing, stable-release
-  validation, semantic-version comparison, trusted release URL construction and request timeouts.
-
-### Changed
-
-- The privacy model now permits one narrowly scoped, user-configurable request to GitHub's public
-  Releases API. It sends no file names, history, presets, telemetry or usage data.
-
 ## [2.0.0] — 2026-08-20
 
 A rewrite. Version 1 was a fixed three-tab form; this is a rule pipeline with a shell around it.
@@ -61,6 +48,12 @@ Presets and history from 1.x are not carried over — there was no on-disk forma
 - **Natural sorting**, matching Explorer's ordering, plus manual reordering.
 - **Diagnostics.** File logging under the data directory, and a copy-diagnostics button on the About
   page that produces the version and environment lines a bug report needs.
+- **GitHub Releases update centre.** Optional delayed startup checks, a title-bar notification,
+  release notes and publication date on the About page, manual checks, persistent “ignore this
+  version”, and one-click opening of the exact GitHub Release.
+- **Hardened update channel.** Strict repository parsing, stable-release validation,
+  semantic-version comparison, trusted release URL construction and request timeouts, isolated
+  behind a separately testable service.
 
 ### Changed
 
@@ -76,6 +69,8 @@ Presets and history from 1.x are not carried over — there was no on-disk forma
 - Releases ship as one compressed, self-contained executable per runtime — x64, ARM64 and x86, about
   68 MB each, with no .NET install required. The publish settings live in the project file, so a
   local publish and the one CI runs produce the same binary.
+- The privacy model permits one narrowly scoped, user-configurable request to GitHub's public
+  Releases API. It sends no file names, history, presets, telemetry or usage data.
 
 ### Fixed
 
