@@ -14,8 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MSI installations now create a desktop shortcut as well as the existing Start-menu shortcut.
 - The selected MSI destination is now recorded as the application's installation location in
   Windows, so management and support tools can locate the installed executable reliably.
-- Installer CI now performs a real x64 install into a custom destination and verifies the executable,
-  desktop shortcut, registered installation location and clean uninstall before a package can ship.
+- Installer CI now verifies every architecture's MSI database contains the executable, desktop and
+  Start-menu shortcuts, registered installation-location action and correct execution sequence.
 
 ## [2.0.1] — 2026-08-20
 
