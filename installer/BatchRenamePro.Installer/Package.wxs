@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix
+  xmlns="http://wixtoolset.org/schemas/v4/wxs"
+  xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Package
+    Name="Batch Rename Pro"
+    Manufacturer="Batch Rename Pro Contributors"
+    Version="$(var.ProductVersion)"
+    Language="2052"
+    Codepage="936"
+    UpgradeCode="{08B7D7D6-E113-46D2-A38F-433594701633}"
+    Scope="perMachine"
+    InstallerVersion="500"
+    Compressed="yes">
+
+    <SummaryInformation Description="Batch Rename Pro Windows Installer" Manufacturer="Batch Rename Pro Contributors" />
+    <MajorUpgrade DowngradeErrorMessage="此电脑已安装更新版本的 Batch Rename Pro。" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Icon Id="ProductIcon.ico" SourceFile="$(sys.SOURCEFILEDIR)..\..\src\BatchRenamePro.App\Assets\app.ico" />
+    <Property Id="ARPPRODUCTICON" Value="ProductIcon.ico" />
+    <Property Id="ARPURLINFOABOUT" Value="$(var.RepositoryUrl)" />
+    <Property Id="ARPHELPLINK" Value="$(var.RepositoryUrl)/issues" />
+    <Property Id="ARPNOREPAIR" Value="1" />
+
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="Batch Rename Pro">
+        <Component Id="ApplicationFiles" Guid="*">
+          <File Id="BatchRenameProExe" Source="$(var.PublishDir)\BatchRenamePro.exe" KeyPath="yes">
+            <Shortcut
+              Id="StartMenuShortcut"
+              Directory="ProgramMenuDirectory"
+              Name="Batch Rename Pro"
+              Description="安全、现代的 Windows 批量文件改名工具"
+              WorkingDirectory="INSTALLFOLDER"
+              Advertise="yes" />
+          </File>
+          <RemoveFolder Id="RemoveProgramMenuDirectory" Directory="ProgramMenuDirectory" On="uninstall" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ProgramMenuDirectory" Name="Batch Rename Pro" />
+    </StandardDirectory>
+
+    <Feature Id="ProductFeature" Title="Batch Rename Pro" Level="1">
+      <ComponentRef Id="ApplicationFiles" />
+    </Feature>
+
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(sys.SOURCEFILEDIR)License.rtf" />
+  </Package>
+</Wix>

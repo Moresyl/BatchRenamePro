@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] — 2026-08-20
+
 ### Added
 
 - **A choice of folder picker.** Settings → Defaults → "Choose folders with" selects between the
@@ -14,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   default; it is the one every other program opens, with the user's own pinned places in it. The
   in-app browser lists the files inside each folder as well as its subfolders, which is what the
   Windows dialog will not do.
+- **Native Windows Installer packages.** Every supported architecture now has an MSI with an
+  install-directory wizard, Start-menu shortcut, installed-app entry, clean uninstall, downgrade
+  protection and major-upgrade support. Portable ZIP packages remain available.
 
 ### Changed
 
@@ -110,5 +115,6 @@ Presets and history from 1.x are not carried over — there was no on-disk forma
   timestamp only advances every 15ms or so — sorted arbitrarily, so the history page could show
   batches out of order and pruning could delete the wrong ones.
 
-[Unreleased]: https://github.com/Moresyl/BatchRenamePro/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/Moresyl/BatchRenamePro/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/Moresyl/BatchRenamePro/releases/tag/v2.0.1
 [2.0.0]: https://github.com/Moresyl/BatchRenamePro/releases/tag/v2.0.0

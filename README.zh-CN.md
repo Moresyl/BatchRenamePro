@@ -55,19 +55,21 @@
 
 ## 安装
 
-到 [最新发布页](https://github.com/Moresyl/BatchRenamePro/releases/latest) 下载对应你电脑的压缩包，
-解压到任意位置，运行 `BatchRenamePro.exe` 即可。发布版为自包含构建，**无需预装 .NET**。
+到 [最新发布页](https://github.com/Moresyl/BatchRenamePro/releases/latest) 下载对应电脑的安装包。
+推荐直接双击 `.msi`：可选择安装目录，并自动创建开始菜单入口和“已安装的应用”卸载项。
+便携使用则下载 `.zip`，解压后运行 `BatchRenamePro.exe`。两种形式都**无需预装 .NET**。
 
 | 下载 | 适用机型 |
 |---|---|
-| `BatchRenamePro-win-x64.zip` | 绝大多数台式机和笔记本 |
-| `BatchRenamePro-win-arm64.zip` | 骁龙 / ARM64 设备 |
-| `BatchRenamePro-win-x86.zip` | 32 位 Windows |
+| `BatchRenamePro-win-x64.msi` | 绝大多数台式机和笔记本，推荐 |
+| `BatchRenamePro-win-arm64.msi` | 骁龙 / ARM64 设备，推荐 |
+| `BatchRenamePro-win-x86.msi` | 32 位 Windows，推荐 |
+| `BatchRenamePro-win-*.zip` | 对应架构的免安装便携版 |
 
 用同一发布页里的 `SHA256SUMS.txt` 校验下载的文件：
 
 ```powershell
-Get-FileHash .\BatchRenamePro-win-x64.zip -Algorithm SHA256
+Get-FileHash .\BatchRenamePro-win-x64.msi -Algorithm SHA256
 ```
 
 ## 快速上手

@@ -58,20 +58,22 @@ does run is a two-phase transaction that rolls itself back if any step fails.
 
 ## Install
 
-Download the archive for your machine from the [latest release](https://github.com/Moresyl/BatchRenamePro/releases/latest),
-unzip it anywhere, and run `BatchRenamePro.exe`. The builds are self-contained — no .NET install
-required.
+Download the installer for your machine from the [latest release](https://github.com/Moresyl/BatchRenamePro/releases/latest).
+The recommended `.msi` lets you choose the install directory and adds Start-menu and installed-app
+entries. For portable use, download the matching `.zip`, unpack it, and run `BatchRenamePro.exe`.
+Both forms are self-contained — no .NET install required.
 
 | Download | For |
 |---|---|
-| `BatchRenamePro-win-x64.zip` | Almost every PC and laptop |
-| `BatchRenamePro-win-arm64.zip` | Snapdragon / ARM64 devices |
-| `BatchRenamePro-win-x86.zip` | 32-bit Windows |
+| `BatchRenamePro-win-x64.msi` | Almost every PC and laptop; recommended |
+| `BatchRenamePro-win-arm64.msi` | Snapdragon / ARM64 devices; recommended |
+| `BatchRenamePro-win-x86.msi` | 32-bit Windows; recommended |
+| `BatchRenamePro-win-*.zip` | Portable build for the matching architecture |
 
 Verify what you downloaded against `SHA256SUMS.txt` in the same release:
 
 ```powershell
-Get-FileHash .\BatchRenamePro-win-x64.zip -Algorithm SHA256
+Get-FileHash .\BatchRenamePro-win-x64.msi -Algorithm SHA256
 ```
 
 ## Quick start

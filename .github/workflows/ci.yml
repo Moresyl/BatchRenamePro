@@ -84,7 +84,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rid: [win-x64, win-arm64, win-x86]
+        include:
+          - rid: win-x64
+            installer_platform: x64
+          - rid: win-arm64
+            installer_platform: arm64
+          - rid: win-x86
+            installer_platform: x86
 
     steps:
       - uses: actions/checkout@v6
@@ -98,7 +104,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ matrix.rid }}-${{ hashFiles('**/Directory.Packages.props', '**/*.csproj') }}
+          key: nuget-${{ runner.os }}-${{ matrix.rid }}-${{ hashFiles('**/Directory.Packages.props', '**/*.csproj', '**/*.wixproj') }}
           restore-keys: nuget-${{ runner.os }}-${{ matrix.rid }}-
 
       - name: Publish
@@ -115,3 +121,19 @@ jobs:
           if (-not (Test-Path $exe)) { throw "$exe was not produced" }
           $mb = [math]::Round((Get-Item $exe).Length / 1MB, 1)
           Write-Output "${{ matrix.rid }}: BatchRenamePro.exe is $mb MB"
+
+      - name: Build MSI installer
+        run: >
+          dotnet build installer/BatchRenamePro.Installer/BatchRenamePro.Installer.wixproj
+          -c Release
+          -p:RuntimeIdentifier=${{ matrix.rid }}
+          -p:InstallerPlatform=${{ matrix.installer_platform }}
+          -p:PublishDir="${{ github.workspace }}\publish\${{ matrix.rid }}"
+
+      - name: Verify the MSI was produced
+        shell: pwsh
+        run: |
+          $msi = "installer/BatchRenamePro.Installer/bin/Release/${{ matrix.rid }}/BatchRenamePro-${{ matrix.rid }}.msi"
+          if (-not (Test-Path $msi)) { throw "$msi was not produced" }
+          $mb = [math]::Round((Get-Item $msi).Length / 1MB, 1)
+          Write-Output "${{ matrix.rid }}: BatchRenamePro-${{ matrix.rid }}.msi is $mb MB"

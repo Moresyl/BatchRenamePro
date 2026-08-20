@@ -25,7 +25,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rid: [win-x64, win-arm64, win-x86]
+        include:
+          - rid: win-x64
+            installer_platform: x64
+          - rid: win-arm64
+            installer_platform: arm64
+          - rid: win-x86
+            installer_platform: x86
 
     steps:
       - uses: actions/checkout@v6
@@ -78,11 +84,28 @@ jobs:
           New-Item -ItemType Directory -Force dist | Out-Null
           Compress-Archive -Path "$staging/*" -DestinationPath "dist/BatchRenamePro-$rid.zip"
 
+      - name: Build MSI installer
+        run: >
+          dotnet build installer/BatchRenamePro.Installer/BatchRenamePro.Installer.wixproj
+          -c Release
+          -p:RuntimeIdentifier=${{ matrix.rid }}
+          -p:InstallerPlatform=${{ matrix.installer_platform }}
+          -p:ProductVersion=${{ steps.version.outputs.version }}
+          -p:PublishDir="${{ github.workspace }}\publish\${{ matrix.rid }}"
+
+      - name: Collect MSI installer
+        shell: pwsh
+        run: |
+          $rid = '${{ matrix.rid }}'
+          $msi = "installer/BatchRenamePro.Installer/bin/Release/$rid/BatchRenamePro-$rid.msi"
+          if (-not (Test-Path $msi)) { throw "$msi was not produced" }
+          Copy-Item $msi dist
+
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
           name: package-${{ matrix.rid }}
-          path: dist/*.zip
+          path: dist/*
           retention-days: 7
 
   release:
@@ -109,7 +132,7 @@ jobs:
       - name: Checksums
         working-directory: dist
         run: |
-          sha256sum *.zip | tee SHA256SUMS.txt
+          sha256sum *.msi *.zip | tee SHA256SUMS.txt
 
       - name: Release notes
         id: notes
@@ -143,15 +166,16 @@ jobs:
             echo
             echo '| File | For |'
             echo '|---|---|'
-            echo '| `BatchRenamePro-win-x64.zip` | Almost every PC and laptop |'
-            echo '| `BatchRenamePro-win-arm64.zip` | Snapdragon / ARM64 devices |'
-            echo '| `BatchRenamePro-win-x86.zip` | 32-bit Windows |'
+            echo '| `BatchRenamePro-win-x64.msi` | Almost every PC and laptop; recommended |'
+            echo '| `BatchRenamePro-win-arm64.msi` | Snapdragon / ARM64 devices; recommended |'
+            echo '| `BatchRenamePro-win-x86.msi` | 32-bit Windows; recommended |'
+            echo '| `BatchRenamePro-win-*.zip` | Portable build for the matching architecture |'
             echo
-            echo 'Self-contained — no .NET install needed. Unzip anywhere and run `BatchRenamePro.exe`.'
+            echo 'The MSI installers and portable ZIPs are self-contained — no .NET install needed.'
             echo 'Verify your download against `SHA256SUMS.txt`:'
             echo
             echo '```powershell'
-            echo 'Get-FileHash .\BatchRenamePro-win-x64.zip -Algorithm SHA256'
+            echo 'Get-FileHash .\BatchRenamePro-win-x64.msi -Algorithm SHA256'
             echo '```'
             echo
             echo 'The executables are not code-signed, so SmartScreen may warn on first run.'
@@ -163,6 +187,7 @@ jobs:
         with:
           name: Batch Rename Pro ${{ github.ref_name }}
           files: |
+            dist/*.msi
             dist/*.zip
             dist/SHA256SUMS.txt
           body: ${{ steps.notes.outputs.notes }}
