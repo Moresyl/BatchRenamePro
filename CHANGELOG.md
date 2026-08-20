@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] — 2026-08-20
+
+### Fixed
+
+- MSI installations now create a desktop shortcut as well as the existing Start-menu shortcut.
+- The selected MSI destination is now recorded as the application's installation location in
+  Windows, so management and support tools can locate the installed executable reliably.
+- Installer CI now performs a real x64 install into a custom destination and verifies the executable,
+  desktop shortcut, registered installation location and clean uninstall before a package can ship.
+
 ## [2.0.1] — 2026-08-20
 
 ### Added
@@ -115,6 +125,7 @@ Presets and history from 1.x are not carried over — there was no on-disk forma
   timestamp only advances every 15ms or so — sorted arbitrarily, so the history page could show
   batches out of order and pruning could delete the wrong ones.
 
-[Unreleased]: https://github.com/Moresyl/BatchRenamePro/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/Moresyl/BatchRenamePro/compare/v2.0.2...HEAD
+[2.0.2]: https://github.com/Moresyl/BatchRenamePro/releases/tag/v2.0.2
 [2.0.1]: https://github.com/Moresyl/BatchRenamePro/releases/tag/v2.0.1
 [2.0.0]: https://github.com/Moresyl/BatchRenamePro/releases/tag/v2.0.0

@@ -59,8 +59,8 @@ does run is a two-phase transaction that rolls itself back if any step fails.
 ## Install
 
 Download the installer for your machine from the [latest release](https://github.com/Moresyl/BatchRenamePro/releases/latest).
-The recommended `.msi` lets you choose the install directory and adds Start-menu and installed-app
-entries. For portable use, download the matching `.zip`, unpack it, and run `BatchRenamePro.exe`.
+The recommended `.msi` lets you choose the install directory, records that location in Windows, and
+adds Desktop, Start-menu, and installed-app entries. For portable use, download the matching `.zip`, unpack it, and run `BatchRenamePro.exe`.
 Both forms are self-contained — no .NET install required.
 
 | Download | For |

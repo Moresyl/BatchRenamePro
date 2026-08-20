@@ -16,7 +16,7 @@
 
   <!-- Product identity. A single place to bump the version for the whole product. -->
   <PropertyGroup>
-    <VersionPrefix>2.0.1</VersionPrefix>
+    <VersionPrefix>2.0.2</VersionPrefix>
     <Product>Batch Rename Pro</Product>
     <Company>Batch Rename Pro Contributors</Company>
     <Authors>Batch Rename Pro Contributors</Authors>

@@ -137,3 +137,14 @@ jobs:
           if (-not (Test-Path $msi)) { throw "$msi was not produced" }
           $mb = [math]::Round((Get-Item $msi).Length / 1MB, 1)
           Write-Output "${{ matrix.rid }}: BatchRenamePro-${{ matrix.rid }}.msi is $mb MB"
+
+      - name: Verify a real MSI installation
+        if: matrix.rid == 'win-x64'
+        shell: pwsh
+        run: |
+          [xml] $props = Get-Content Directory.Build.props
+          $version = ($props.Project.PropertyGroup.VersionPrefix | Where-Object { $_ } | Select-Object -First 1)
+          ./tools/test-msi-installation.ps1 `
+            -MsiPath installer/BatchRenamePro.Installer/bin/Release/${{ matrix.rid }}/BatchRenamePro-${{ matrix.rid }}.msi `
+            -ExpectedVersion $version `
+            -InstallDirectory "${{ runner.temp }}\BatchRenamePro Custom Location"

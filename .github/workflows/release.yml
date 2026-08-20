@@ -101,6 +101,15 @@ jobs:
           if (-not (Test-Path $msi)) { throw "$msi was not produced" }
           Copy-Item $msi dist
 
+      - name: Verify a real MSI installation
+        if: matrix.rid == 'win-x64'
+        shell: pwsh
+        run: >
+          ./tools/test-msi-installation.ps1
+          -MsiPath dist/BatchRenamePro-${{ matrix.rid }}.msi
+          -ExpectedVersion ${{ steps.version.outputs.version }}
+          -InstallDirectory "${{ runner.temp }}\BatchRenamePro Custom Location"
+
       - name: Upload
         uses: actions/upload-artifact@v7
         with:

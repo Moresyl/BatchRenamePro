@@ -22,6 +22,12 @@
     <Property Id="ARPURLINFOABOUT" Value="$(var.RepositoryUrl)" />
     <Property Id="ARPHELPLINK" Value="$(var.RepositoryUrl)/issues" />
     <Property Id="ARPNOREPAIR" Value="1" />
+    <Property Id="ARPINSTALLLOCATION" Secure="yes" />
+    <SetProperty
+      Id="ARPINSTALLLOCATION"
+      Value="[INSTALLFOLDER]"
+      After="CostFinalize"
+      Sequence="execute" />
 
     <StandardDirectory Id="ProgramFiles6432Folder">
       <Directory Id="INSTALLFOLDER" Name="Batch Rename Pro">
@@ -30,6 +36,13 @@
             <Shortcut
               Id="StartMenuShortcut"
               Directory="ProgramMenuDirectory"
+              Name="Batch Rename Pro"
+              Description="安全、现代的 Windows 批量文件改名工具"
+              WorkingDirectory="INSTALLFOLDER"
+              Advertise="yes" />
+            <Shortcut
+              Id="DesktopShortcut"
+              Directory="DesktopFolder"
               Name="Batch Rename Pro"
               Description="安全、现代的 Windows 批量文件改名工具"
               WorkingDirectory="INSTALLFOLDER"
@@ -43,6 +56,8 @@
     <StandardDirectory Id="ProgramMenuFolder">
       <Directory Id="ProgramMenuDirectory" Name="Batch Rename Pro" />
     </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder" />
 
     <Feature Id="ProductFeature" Title="Batch Rename Pro" Level="1">
       <ComponentRef Id="ApplicationFiles" />
