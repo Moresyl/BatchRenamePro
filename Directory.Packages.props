@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup Label="Testing">
-    <PackageVersion Include="MSTest" Version="4.0.1" />
+    <PackageVersion Include="MSTest" Version="4.3.3" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
   </ItemGroup>
 
