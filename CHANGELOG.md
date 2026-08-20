@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.3] — 2026-08-20
+
+### Fixed
+
+- The MSI directory picker now selects a parent directory and always creates a dedicated
+  `Batch Rename Pro` child folder. Selecting `E:\RJ`, for example, installs to
+  `E:\RJ\Batch Rename Pro` instead of placing the executable directly in `E:\RJ`.
+
 ## [2.0.2] — 2026-08-20
 
 ### Fixed
@@ -125,7 +133,8 @@ Presets and history from 1.x are not carried over — there was no on-disk forma
   timestamp only advances every 15ms or so — sorted arbitrarily, so the history page could show
   batches out of order and pruning could delete the wrong ones.
 
-[Unreleased]: https://github.com/Moresyl/BatchRenamePro/compare/v2.0.2...HEAD
+[Unreleased]: https://github.com/Moresyl/BatchRenamePro/compare/v2.0.3...HEAD
+[2.0.3]: https://github.com/Moresyl/BatchRenamePro/releases/tag/v2.0.3
 [2.0.2]: https://github.com/Moresyl/BatchRenamePro/releases/tag/v2.0.2
 [2.0.1]: https://github.com/Moresyl/BatchRenamePro/releases/tag/v2.0.1
 [2.0.0]: https://github.com/Moresyl/BatchRenamePro/releases/tag/v2.0.0

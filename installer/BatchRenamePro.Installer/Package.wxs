@@ -30,26 +30,28 @@
       Sequence="execute" />
 
     <StandardDirectory Id="ProgramFiles6432Folder">
-      <Directory Id="INSTALLFOLDER" Name="Batch Rename Pro">
-        <Component Id="ApplicationFiles" Guid="*">
-          <File Id="BatchRenameProExe" Source="$(var.PublishDir)\BatchRenamePro.exe" KeyPath="yes">
-            <Shortcut
-              Id="StartMenuShortcut"
-              Directory="ProgramMenuDirectory"
-              Name="Batch Rename Pro"
-              Description="安全、现代的 Windows 批量文件改名工具"
-              WorkingDirectory="INSTALLFOLDER"
-              Advertise="yes" />
-            <Shortcut
-              Id="DesktopShortcut"
-              Directory="DesktopFolder"
-              Name="Batch Rename Pro"
-              Description="安全、现代的 Windows 批量文件改名工具"
-              WorkingDirectory="INSTALLFOLDER"
-              Advertise="yes" />
-          </File>
-          <RemoveFolder Id="RemoveProgramMenuDirectory" Directory="ProgramMenuDirectory" On="uninstall" />
-        </Component>
+      <Directory Id="INSTALLROOT">
+        <Directory Id="INSTALLFOLDER" Name="Batch Rename Pro">
+          <Component Id="ApplicationFiles" Guid="*">
+            <File Id="BatchRenameProExe" Source="$(var.PublishDir)\BatchRenamePro.exe" KeyPath="yes">
+              <Shortcut
+                Id="StartMenuShortcut"
+                Directory="ProgramMenuDirectory"
+                Name="Batch Rename Pro"
+                Description="安全、现代的 Windows 批量文件改名工具"
+                WorkingDirectory="INSTALLFOLDER"
+                Advertise="yes" />
+              <Shortcut
+                Id="DesktopShortcut"
+                Directory="DesktopFolder"
+                Name="Batch Rename Pro"
+                Description="安全、现代的 Windows 批量文件改名工具"
+                WorkingDirectory="INSTALLFOLDER"
+                Advertise="yes" />
+            </File>
+            <RemoveFolder Id="RemoveProgramMenuDirectory" Directory="ProgramMenuDirectory" On="uninstall" />
+          </Component>
+        </Directory>
       </Directory>
     </StandardDirectory>
 
@@ -63,7 +65,7 @@
       <ComponentRef Id="ApplicationFiles" />
     </Feature>
 
-    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLROOT" />
     <WixVariable Id="WixUILicenseRtf" Value="$(sys.SOURCEFILEDIR)License.rtf" />
   </Package>
 </Wix>

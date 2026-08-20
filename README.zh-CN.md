@@ -56,7 +56,7 @@
 ## 安装
 
 到 [最新发布页](https://github.com/Moresyl/BatchRenamePro/releases/latest) 下载对应电脑的安装包。
-推荐直接双击 `.msi`：可选择安装目录，并自动创建桌面图标、开始菜单入口和“已安装的应用”卸载项；所选安装位置也会登记到 Windows。
+推荐直接双击 `.msi`：选择父目录后会自动创建 `Batch Rename Pro` 产品目录、桌面图标、开始菜单入口和“已安装的应用”卸载项；实际安装位置也会登记到 Windows。
 便携使用则下载 `.zip`，解压后运行 `BatchRenamePro.exe`。两种形式都**无需预装 .NET**。
 
 | 下载 | 适用机型 |

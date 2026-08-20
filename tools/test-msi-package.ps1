@@ -77,8 +77,24 @@ try {
         throw 'The MSI does not contain BatchRenamePro.exe.'
     }
 
+    $installRootParent = Get-MsiValue -Query "SELECT `Directory_Parent` FROM `Directory` WHERE `Directory` = 'INSTALLROOT'"
+    $installRootName = Get-MsiValue -Query "SELECT `DefaultDir` FROM `Directory` WHERE `Directory` = 'INSTALLROOT'"
+    $installFolderParent = Get-MsiValue -Query "SELECT `Directory_Parent` FROM `Directory` WHERE `Directory` = 'INSTALLFOLDER'"
+    $installFolderName = Get-MsiValue -Query "SELECT `DefaultDir` FROM `Directory` WHERE `Directory` = 'INSTALLFOLDER'"
+    if ($installRootParent -ne 'ProgramFiles6432Folder' -or
+        $installRootName -ne '.' -or
+        $installFolderParent -ne 'INSTALLROOT' -or
+        $installFolderName -notmatch 'Batch Rename Pro$') {
+        throw 'The MSI does not create a Batch Rename Pro child folder under the selected parent directory.'
+    }
+
+    $installDirectoryPicker = Get-MsiValue -Query "SELECT `Value` FROM `Property` WHERE `Property` = 'WIXUI_INSTALLDIR'"
+    if ($installDirectoryPicker -ne 'INSTALLROOT') {
+        throw 'The install-directory dialog is not configured to select the parent directory.'
+    }
+
     Write-Output "Verified MSI contract for Batch Rename Pro $ExpectedVersion"
-    Write-Output 'Verified executable, Desktop and Start-menu shortcuts, and InstallLocation registration'
+    Write-Output 'Verified product subfolder, executable, shortcuts, and InstallLocation registration'
 }
 finally {
     [Runtime.InteropServices.Marshal]::FinalReleaseComObject($database) | Out-Null
